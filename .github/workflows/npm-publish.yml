@@ -1,0 +1,46 @@
+name: Publish Packages
+
+on: workflow_dispatch
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Git config user
+        uses: snow-actions/git-config-user@v1.0.0
+        with:
+          name: github-actions
+          email: github-actions@github.com
+
+      - name: Verify Change Logs
+        run: node common/scripts/install-run-rush.js change --verify
+
+      - name: Rush Install
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Rush rebuild
+        run: node common/scripts/install-run-rush.js rebuild --verbose
+
+      - name: Publish packages to npm
+        run: node common/scripts/install-run-rush.js publish --apply --target-branch main --publish --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --add-commit-details --include-all
+
+      - name: Commit and Push package.json version update
+        run: |
+          git add .
+          git commit -m "chore: Bump versions"
+          git push --no-verify
+

@@ -1,0 +1,2 @@
+patchedDependencies:
+  '@reown/appkit': patches/@reown__appkit.patch

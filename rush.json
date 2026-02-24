@@ -1,0 +1,26 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  "rushVersion": "5.169.2",
+  "pnpmVersion": "9.15.9",
+  "repository": {
+    "url": "https://github.com/CityOfZion/wallet-connect-adapters",
+    "defaultBranch": "main"
+  },
+  "projects": [
+    {
+      "packageName": "@cityofzion/appkit-neo3-adapter",
+      "projectFolder": "packages/appkit-neo3-adapter",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@cityofzion/appkit-stellar-adapter",
+      "projectFolder": "packages/appkit-stellar-adapter",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@cityofzion/appkit-neox-adapter",
+      "projectFolder": "packages/appkit-neox-adapter",
+      "shouldPublish": true
+    }
+  ]
+}

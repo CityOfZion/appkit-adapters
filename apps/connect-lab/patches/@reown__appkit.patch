@@ -1,0 +1,33 @@
+diff --git a/dist/esm/src/client/appkit-base-client.js b/dist/esm/src/client/appkit-base-client.js
+index f9b7794662c383bef5c1e2be6dac200bcf96fc77..9788a48b4206614727d4993cfa53b552c711b2ec 100644
+--- a/dist/esm/src/client/appkit-base-client.js
++++ b/dist/esm/src/client/appkit-base-client.js
+@@ -1306,22 +1306,23 @@ export class AppKitBaseClient {
+         const isActiveNamespace = params.chainNamespace === ChainController.state.activeChain;
+         const networkOfChain = ChainController.getCaipNetworkByNamespace(params.chainNamespace, params.chainId);
+         const { address, chainId, chainNamespace } = params;
+-        const { chainId: activeChainId } = StorageUtil.getActiveNetworkProps();
+-        const chainIdToUse = networkOfChain?.id || activeChainId;
++        const { caipNetworkId: activeCaipNetworkId } = StorageUtil.getActiveNetworkProps();
++        const caipNetworkIdToUse = networkOfChain?.caipNetworkId || activeCaipNetworkId;
++
+         const isUnsupportedNetwork = ChainController.state.activeCaipNetwork?.name === ConstantsUtil.UNSUPPORTED_NETWORK_NAME;
+         const shouldSupportAllNetworks = ChainController.getNetworkProp('supportsAllNetworks', chainNamespace);
+         this.setStatus('connected', chainNamespace);
+         if (isUnsupportedNetwork && !shouldSupportAllNetworks) {
+             return;
+         }
+-        if (chainIdToUse) {
+-            let caipNetwork = this.getCaipNetworks().find(n => n.id.toString() === chainIdToUse.toString());
++        if (caipNetworkIdToUse) {
++            let caipNetwork = this.getCaipNetworks().find(n => n.caipNetworkId === caipNetworkIdToUse);
+             let fallbackCaipNetwork = this.getCaipNetworks().find(n => n.chainNamespace === chainNamespace);
+             // If doesn't support all networks, we need to use approved networks
+             if (!shouldSupportAllNetworks && !caipNetwork && !fallbackCaipNetwork) {
+                 // Connection can be requested for a chain that is not supported by the wallet so we need to use approved networks here
+                 const caipNetworkIds = this.getApprovedCaipNetworkIds() || [];
+-                const caipNetworkId = caipNetworkIds.find(id => ParseUtil.parseCaipNetworkId(id)?.chainId === chainIdToUse.toString());
++                const caipNetworkId = caipNetworkIds.find(id => id === caipNetworkIdToUse);
+                 const fallBackCaipNetworkId = caipNetworkIds.find(id => ParseUtil.parseCaipNetworkId(id)?.chainNamespace === chainNamespace);
+                 caipNetwork = this.getCaipNetworks().find(n => n.caipNetworkId === caipNetworkId);
+                 fallbackCaipNetwork = this.getCaipNetworks().find(n => n.caipNetworkId === fallBackCaipNetworkId ||
