@@ -12,6 +12,12 @@ You can access the deployed project here: [Connect Lab on GitHub Pages](https://
 - [Node.js](https://nodejs.org/) (v22 or newer recommended)
 - [pnpm](https://pnpm.io/) (v10 or newer)
 
+### Build Packages
+
+```bash
+rush update && rush rebuild
+```
+
 ### Install dependencies
 
 ```bash
@@ -24,7 +30,7 @@ pnpm install
 pnpm run dev
 ```
 
-Open [http://localhost:5173/appkit-adapters](http://localhost:5173/appkit-adapters) to view the app in your browser.
+Open [http://localhost:5173/appkit-adapters](http://localhost:5173/appkit-adapters/) to view the app in your browser.
 
 ## Project Structure
 

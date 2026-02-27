@@ -582,12 +582,14 @@ export function EIP155Methods() {
   } = useConnection<true>();
 
   function sendSendTransaction() {
-    request("eth_sendTransaction", async () => {
-      await sendTransaction(AppKitHelper.eip155Adapter.wagmiConfig, {
-        to: address as Hex,
-        value: parseEther("0.000001"),
-      });
-    });
+    request(
+      "eth_sendTransaction",
+      async () =>
+        await sendTransaction(AppKitHelper.eip155Adapter.wagmiConfig, {
+          to: address as Hex,
+          value: parseEther("0.000001"),
+        }),
+    );
   }
 
   function sendSendContractTransaction() {

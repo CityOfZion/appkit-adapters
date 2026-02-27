@@ -73,6 +73,9 @@ export class AppKitHelper {
         "--apkt-accent": "#2563eb",
         "--apkt-font-family": "Plus Jakarta Sans",
       },
+      featuredWalletIds: [
+        "f039a4bdf6d5a54065b6cc4b134e32d23bed5d391ad97f25aab5627de26a0784", // NEON Wallet
+      ],
     });
   }
 

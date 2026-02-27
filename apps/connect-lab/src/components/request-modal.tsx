@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { useRequest } from "@/hooks/use-request";
-import { Code, Copy } from "lucide-react";
+import { Code } from "lucide-react";
+import { CopyButton } from "./copy-button";
+import { StyleHelper } from "@/helpers/style";
 
 export function RequestModal() {
   const { requestState, setRequestState } = useRequest();
@@ -13,7 +15,14 @@ export function RequestModal() {
       onOpenChange={() => setRequestState({ status: "idle" })}
     >
       {requestState.status !== "idle" && (
-        <Dialog.Content onInteractOutside={(event) => event.preventDefault()}>
+        <Dialog.Content
+          onInteractOutside={(event) => event.preventDefault()}
+          className={StyleHelper.merge({
+            "sm:max-w-[90dvw] duration-0 w-sm min-w-160 max-h-[90dvh] resize min-h-130":
+              requestState.status === "success" ||
+              requestState.status === "error",
+          })}
+        >
           <Dialog.Header className="flex-row w-full items-center">
             <div className="p-2 bg-blue-500/10 rounded-lg">
               <Code className="size-4 text-blue-400" />
@@ -44,26 +53,20 @@ export function RequestModal() {
               </div>
             </Dialog.Body>
           ) : (
-            <Dialog.Body className="items-center text-center py-5">
+            <Dialog.Body className="items-center text-center py-5 grow">
               <div
                 data-status={requestState.status}
-                className="relative bg-black text-left data-[status=error]:bg-red-950/5 w-full backdrop-blur-lg rounded-2xl p-8 border border-emerald-500/20 text-emerald-400/90 data-[status=error]:border-red-500/20 data-[status=error]:text-red-400/90 overflow-y-scroll min-h-65 max-h-65"
+                className="relative bg-black text-left data-[status=error]:bg-red-950/5 w-full backdrop-blur-lg rounded-2xl pb-8 pt-12 px-8 border border-emerald-500/20 text-emerald-400/90 data-[status=error]:border-red-500/20 data-[status=error]:text-red-400/90 overflow-y-auto grow"
               >
-                <Button
-                  className="absolute top-4 right-4"
-                  variant="ghost"
-                  size="icon-sm"
-                >
-                  <Copy className="size-4" />
-                </Button>
+                <CopyButton content={requestState.data} />
 
-                <pre className="font-mono w-full h-full font-medium text-sm leading-relaxed whitespace-pre-wrap wrap-break-word mt-4">
+                <pre className="font-mono w-full font-medium text-sm leading-relaxed whitespace-pre-wrap wrap-break-word h-full">
                   {JSON.stringify(requestState.data, null, 2)}
                 </pre>
               </div>
 
               <Button
-                className="w-full"
+                className="w-full mt-auto"
                 variant="outline"
                 onClick={() => setRequestState({ status: "idle" })}
               >

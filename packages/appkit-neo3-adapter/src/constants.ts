@@ -1,12 +1,12 @@
 export class Neo3Constants {
-  static GAS_TOKEN = {
+  static readonly GAS_TOKEN = {
     symbol: "GAS",
     name: "GAS",
     hash: "0xd2a4cff31913016155e38e474a2c06d08be276cf",
     decimals: 8,
   } as const;
 
-  static METHODS: string[] = [
+  static readonly METHODS: string[] = [
     "invokeFunction",
     "testInvoke",
     "signMessage",
@@ -19,9 +19,9 @@ export class Neo3Constants {
     "signTransaction",
   ];
 
-  static EVENTS: string[] = [];
+  static readonly EVENTS: string[] = [];
 
-  static OVERRIDES: {
+  static readonly OVERRIDES: {
     methods?: Record<string, string[]>;
     chains?: Record<string, string[]>;
     events?: Record<string, string[]>;

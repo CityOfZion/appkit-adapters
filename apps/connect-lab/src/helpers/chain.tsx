@@ -63,13 +63,50 @@ export class ChainHelper {
 
   static readonly colorsByChain: Record<TSupportedChain, string> = {
     neo3: "#16a34a",
-    ethereum: "#2563eb",
-    arbitrum: "#2563eb",
+    ethereum: "#627eea",
+    arbitrum: "#28a0f0",
     base: "#1d4ed8",
     neox: "#10b981",
     polygon: "#9333ea",
     solana: "#6366f1",
     stellar: "#fcd34d",
+  };
+
+  static readonly addressExplorerUrlsByChain: Record<
+    TSupportedChain,
+    Record<string, string>
+  > = {
+    neo3: {
+      mainnet: "https://dora.coz.io/address/neo3/mainnet/{address}",
+      testnet: "https://dora.coz.io/address/neo3/testnet/{address}",
+    },
+    ethereum: {
+      1: "https://eth.blockscout.com/address/{address}",
+      11_155_111: "https://eth-sepolia.blockscout.com/address/{address}",
+    },
+    arbitrum: {
+      42_161: "https://arbitrum.blockscout.com/address/{address}",
+    },
+    base: {
+      8_453: "https://base.blockscout.com/address/{address}",
+    },
+    polygon: {
+      137: "https://polygon.blockscout.com/address/{address}",
+    },
+    neox: {
+      47_763: "https://xexplorer.neo.org/address/{address}",
+      12_227_332: "https://xt4scan.ngd.network/address/{address}",
+    },
+    solana: {
+      "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp":
+        "https://solscan.io/account/{address}",
+      EtWTRABZaYq6iMfeYKouRu166VU2xqa1:
+        "https://solscan.io/account/{address}?cluster=devnet",
+    },
+    stellar: {
+      mainnet: "https://stellarchain.io/accounts/{address}",
+      testnet: "https://testnet.stellarchain.io//accounts/{address}",
+    },
   };
 
   static readonly namespaceByChain: Record<TSupportedChain, ChainNamespace> = {
@@ -91,7 +128,6 @@ export class ChainHelper {
     base: [base],
     polygon: [polygon],
     neo3: [neo3MainnetNetwork, neo3TestnetNetwork],
-    // TODO: Fix that
     neox: [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork],
     solana: [solana, solanaDevnet],
     stellar: [stellarMainnetNetwork, stellarTestnetNetwork],

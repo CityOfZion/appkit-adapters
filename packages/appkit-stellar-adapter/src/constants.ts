@@ -1,5 +1,5 @@
 export class StellarConstants {
-  static XLM_TOKEN = {
+  static readonly XLM_TOKEN = {
     symbol: "XLM",
     name: "Lumens",
     decimals: 7,
@@ -10,7 +10,7 @@ export class StellarConstants {
     testnet: "https://horizon-testnet.stellar.org",
   };
 
-  static METHODS: string[] = [
+  static readonly METHODS: string[] = [
     "stellar_signXDR",
     "stellar_signAndSubmitXDR",
     "stellar_signMessage",
@@ -18,9 +18,9 @@ export class StellarConstants {
     "stellar_getNetwork",
   ];
 
-  static EVENTS: string[] = [];
+  static readonly EVENTS: string[] = [];
 
-  static OVERRIDES: {
+  static readonly OVERRIDES: {
     methods?: Record<string, string[]>;
     chains?: Record<string, string[]>;
     events?: Record<string, string[]>;

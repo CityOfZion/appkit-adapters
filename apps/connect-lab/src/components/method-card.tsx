@@ -1,6 +1,7 @@
 import { BookOpen } from "lucide-react";
 import { Button } from "./ui/button";
 import { Tooltip } from "./ui/tooltip";
+import { Link } from "@tanstack/react-router";
 
 type TProps = {
   name: string;
@@ -28,8 +29,10 @@ export function MethodCard({ name, docUrl, description, onPlay }: TProps) {
         {docUrl && (
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button size="icon-sm" variant="outline">
-                <BookOpen className="size-4" />
+              <Button size="icon-sm" variant="outline" asChild>
+                <Link to={docUrl} target="_blank" rel="noopener noreferrer">
+                  <BookOpen className="size-4" />
+                </Link>
               </Button>
             </Tooltip.Trigger>
 

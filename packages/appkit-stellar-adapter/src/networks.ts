@@ -14,9 +14,7 @@ export const stellarMainnetNetwork: AppKitNetwork = {
 
   rpcUrls: {
     default: {
-      http: [
-        "https://stellar-mainnet.liquify.com/api=41EEWAH79Y5OCGI7/mainnet",
-      ],
+      http: ["https://soroban-rpc.mainnet.stellar.gateway.fm/"],
     },
   },
 
@@ -36,7 +34,7 @@ export const stellarTestnetNetwork: AppKitNetwork = {
 
   rpcUrls: {
     default: {
-      http: ["https://stellar.liquify.com/api=41EEWAH79Y5OCGI7/testnet"],
+      http: ["https://soroban-rpc.testnet.stellar.gateway.fm/"],
     },
   },
 

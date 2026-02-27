@@ -9,7 +9,7 @@ import { SolanaMethods } from "@/components/methods/solana-methods";
 import { Neo3Methods } from "@/components/methods/neo3-methods";
 import { StellarMethods } from "@/components/methods/stellar-methods";
 
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { Unlink } from "lucide-react";
 import { useTransition, Fragment, type ComponentType } from "react";
 import { InfoBox } from "./-info-box";
@@ -45,6 +45,15 @@ function RouteComponent() {
   const ChainIcon = ChainHelper.iconsByChain[connectionInfo.chain];
   const chainColor = ChainHelper.colorsByChain[connectionInfo.chain];
 
+  const addressExplorerUrl =
+    ChainHelper.addressExplorerUrlsByChain[connectionInfo.chain][
+      connectionInfo.networkId
+    ];
+  const replacedAddressExplorerUrl = addressExplorerUrl?.replace(
+    "{address}",
+    connectionInfo.address,
+  );
+
   return (
     <div className="min-h-screen w-screen relative px-4 py-10 flex justify-center overflow-auto">
       <InteractiveBackground />
@@ -69,11 +78,25 @@ function RouteComponent() {
               {connectionInfo.networkId}
             </InfoBox>
 
-            <InfoBox label="Address" className="grow min-w-0 max-md:col-span-6">
-              <p className="text-sm font-black text-primary font-sans capitalize truncate">
-                {connectionInfo.address}
-              </p>
-            </InfoBox>
+            <Button
+              className="grow min-w-0 max-md:col-span-6 h-full flex-col items-start px-4 py-2 gap-0"
+              variant="outline"
+              asChild
+            >
+              <Link
+                to={replacedAddressExplorerUrl ?? "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <p className="capitalize text-xs font-medium text-slate-500 font-grotesk whitespace-nowrap">
+                  Address
+                </p>
+
+                <p className="text-sm font-black text-primary font-sans capitalize truncate">
+                  {connectionInfo.address}
+                </p>
+              </Link>
+            </Button>
 
             <Button
               className="min-w-40 h-full rounded-xl max-md:col-span-6"
