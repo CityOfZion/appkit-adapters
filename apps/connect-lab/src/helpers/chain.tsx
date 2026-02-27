@@ -105,7 +105,7 @@ export class ChainHelper {
     },
     stellar: {
       mainnet: "https://stellarchain.io/accounts/{address}",
-      testnet: "https://testnet.stellarchain.io//accounts/{address}",
+      testnet: "https://testnet.stellarchain.io/accounts/{address}",
     },
   };
 
