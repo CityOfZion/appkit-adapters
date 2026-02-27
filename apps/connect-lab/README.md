@@ -12,6 +12,14 @@ You can access the deployed project here: [Connect Lab on GitHub Pages](https://
 - [Node.js](https://nodejs.org/) (v22 or newer recommended)
 - [pnpm](https://pnpm.io/) (v10 or newer)
 
+## Environment Variables
+
+Before running the app, you must set the required environment variable in a `.env` file in `apps/connect-lab/`:
+
+```env
+VITE_PROJECT_ID=your_project_id_here
+```
+
 ### Build Packages
 
 ```bash
