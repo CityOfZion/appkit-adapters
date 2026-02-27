@@ -14,7 +14,7 @@ export const stellarMainnetNetwork: AppKitNetwork = {
 
   rpcUrls: {
     default: {
-      http: ["https://soroban-rpc.mainnet.stellar.gateway.fm/"],
+      http: ["https://soroban-rpc.mainnet.stellar.gateway.fm"],
     },
   },
 
@@ -34,7 +34,7 @@ export const stellarTestnetNetwork: AppKitNetwork = {
 
   rpcUrls: {
     default: {
-      http: ["https://soroban-rpc.testnet.stellar.gateway.fm/"],
+      http: ["https://soroban-rpc.testnet.stellar.gateway.fm"],
     },
   },
 
