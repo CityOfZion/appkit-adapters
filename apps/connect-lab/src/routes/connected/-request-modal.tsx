@@ -51,7 +51,7 @@ export function RequestModal() {
                 data-status={requestState.status}
                 className="relative w-full grow overflow-y-auto rounded-2xl border border-emerald-500/20 bg-black px-8 pt-12 pb-8 text-left text-emerald-400/90 backdrop-blur-lg data-[status=error]:border-red-500/20 data-[status=error]:bg-red-950/5 data-[status=error]:text-red-400/90"
               >
-                <CopyButton content={requestState.data} />
+                <CopyButton className="absolute top-4 right-4" content={requestState.data} />
 
                 <pre className="h-full w-full font-mono text-sm leading-relaxed font-medium wrap-break-word whitespace-pre-wrap">
                   {JSON.stringify(requestState.data, null, 2)}

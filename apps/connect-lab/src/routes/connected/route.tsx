@@ -16,6 +16,8 @@ import { InfoBox } from './-info-box'
 import { NeoxMethods } from '@/components/methods/neox-methods'
 import { Tabs } from '@/components/ui/tabs'
 import { CustomRequest } from './-custom-request'
+import { Tooltip } from '@/components/ui/tooltip'
+import { CopyButton } from '@/components/copy-button'
 
 export const Route = createFileRoute('/connected')({
   component: RouteComponent,
@@ -58,7 +60,7 @@ function RouteComponent() {
 
       <div className="flex min-h-screen w-full max-w-7xl flex-col gap-12 px-4 py-10">
         <header className="flex flex-col gap-4">
-          <div className="flex w-full gap-2 max-md:grid max-md:grid-cols-6 max-md:grid-rows-3">
+          <div className="flex w-full min-w-0 gap-2 max-md:grid max-md:grid-cols-6 max-md:grid-rows-3">
             <InfoBox className="items-center justify-center">
               <ChainIcon className="size-4 min-h-4 min-w-4" style={{ color: chainColor }} />
             </InfoBox>
@@ -71,23 +73,31 @@ function RouteComponent() {
               {connectionInfo.networkId}
             </InfoBox>
 
-            {
-              <Button
-                className="h-full min-w-0 grow flex-col items-start gap-0 px-4 py-2 max-md:col-span-6"
-                variant="outline"
-                asChild
-              >
-                <Link to={replacedAddressExplorerUrl ?? '#'} target="_blank" rel="noopener noreferrer">
-                  <p className="font-grotesk text-xs font-medium whitespace-nowrap text-slate-500 capitalize">
-                    Address
-                  </p>
+            <Button
+              className="h-full min-w-0 shrink grow flex-col items-start gap-0 truncate rounded-xl px-4 py-2 max-md:col-span-5"
+              variant="outline"
+              asChild
+            >
+              <Link to={replacedAddressExplorerUrl ?? '#'} target="_blank" rel="noopener noreferrer">
+                <p className="font-grotesk text-xs font-medium whitespace-nowrap text-slate-500 capitalize">Address</p>
 
-                  <p className="text-primary truncate font-sans text-sm font-black capitalize">
-                    {connectionInfo.address}
-                  </p>
-                </Link>
-              </Button>
-            }
+                <p className="text-primary w-full truncate font-sans text-sm font-black capitalize">
+                  {connectionInfo.address}
+                </p>
+              </Link>
+            </Button>
+
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild onClick={e => e.preventDefault()}>
+                <CopyButton
+                  content={connectionInfo.address}
+                  className="size-13 h-full rounded-xl max-md:w-full"
+                  variant="outline"
+                />
+              </Tooltip.Trigger>
+
+              <Tooltip.Content side="bottom">Copy Address</Tooltip.Content>
+            </Tooltip.Root>
 
             <Button
               className="h-full min-w-40 rounded-xl max-md:col-span-6"
