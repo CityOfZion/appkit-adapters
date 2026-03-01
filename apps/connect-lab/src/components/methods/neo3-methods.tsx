@@ -247,7 +247,7 @@ export function Neo3Methods() {
         <MethodCard
           name="encrypt"
           description="Encrypts arbitrary data using the wallet’s cryptographic features for secure storage or transmission."
-          docUrl="https://github.com/CityOfZion/neon-dappkit/blob/main/packages/neon-dappkit/NEON-SIGNER.md#sign-and-verify-message"
+          docUrl="https://github.com/CityOfZion/neon-dappkit/blob/main/packages/neon-dappkit/NEON-SIGNER.md#encrypt-and-decrypt-data"
           onPlay={sendEncrypt}
         />
       </li>
@@ -256,7 +256,7 @@ export function Neo3Methods() {
         <MethodCard
           name="decrypt"
           description="Decrypts data that was previously encrypted using the wallet."
-          docUrl="https://github.com/CityOfZion/neon-dappkit/blob/main/packages/neon-dappkit/NEON-SIGNER.md#sign-and-verify-message"
+          docUrl="https://github.com/CityOfZion/neon-dappkit/blob/main/packages/neon-dappkit/NEON-SIGNER.md#encrypt-and-decrypt-data"
           onPlay={sendDecrypt}
         />
       </li>
@@ -265,7 +265,7 @@ export function Neo3Methods() {
         <MethodCard
           name="decryptFromArray"
           description="Decrypts multiple encrypted payloads in a single request."
-          docUrl="https://github.com/CityOfZion/neon-dappkit/blob/main/packages/neon-dappkit/NEON-SIGNER.md#sign-and-verify-message"
+          docUrl="https://github.com/CityOfZion/neon-dappkit/blob/main/packages/neon-dappkit/NEON-SIGNER.md#encrypt-and-decrypt-data"
           onPlay={sendDecryptFromArray}
         />
       </li>
