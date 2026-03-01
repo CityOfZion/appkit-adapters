@@ -13,10 +13,10 @@ import { Fragment } from "react";
 export function SolanaMethods() {
   const { request } = useRequest();
   const {
-    connectionInfo: { address },
+    connectionInfo: { address, namespace },
   } = useConnection<true>();
 
-  const { walletProvider } = useAppKitProvider<Provider>("solana");
+  const { walletProvider } = useAppKitProvider<Provider>(namespace);
   const { connection } = useAppKitConnection();
 
   async function sendSignAndSendTransaction() {

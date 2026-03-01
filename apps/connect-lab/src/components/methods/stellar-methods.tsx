@@ -9,10 +9,9 @@ import * as stellarSDK from "@stellar/stellar-sdk";
 export function StellarMethods() {
   const { request } = useRequest();
   const {
-    connectionInfo: { address, activeCaipNetwork },
+    connectionInfo: { address, activeCaipNetwork, namespace },
   } = useConnection<true>();
-  //@ts-expect-error ChainNamespace does not include stellar
-  const { walletProvider } = useAppKitProvider<StellarProvider>("stellar");
+  const { walletProvider } = useAppKitProvider<StellarProvider>(namespace);
 
   function sendSignTransaction() {
     request("signTransaction", async () => {

@@ -19,6 +19,7 @@ export type TConnectedConnectionInfo = {
   address: string;
   networkId: string;
   chain: TSupportedChain;
+  namespace: ChainNamespace;
   activeCaipNetwork: CaipNetwork;
   walletInfo: {
     name?: string;
@@ -134,6 +135,7 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
         chain: connectedChain,
         loading: false,
         activeCaipNetwork,
+        namespace: connectedNamespace as ChainNamespace,
         walletInfo: {
           icon: walletInfo?.icon,
           name: walletInfo?.name,

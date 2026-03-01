@@ -11,10 +11,9 @@ import { useConnection } from "@/hooks/use-connection";
 export function Neo3Methods() {
   const { request } = useRequest();
   const {
-    connectionInfo: { address },
+    connectionInfo: { address, namespace },
   } = useConnection<true>();
-  //@ts-expect-error ChainNamespace does not include neo3
-  const { walletProvider } = useAppKitProvider<Neo3Provider>("neo3");
+  const { walletProvider } = useAppKitProvider<Neo3Provider>(namespace);
 
   function sendInvokeFunction() {
     request("invokeFunction", async () =>
