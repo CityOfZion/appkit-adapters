@@ -222,7 +222,7 @@ export class Neo3Connector extends WalletConnectConnector implements Provider {
   ): Promise<EncryptedPayload[]> {
     const resp = await this.request({
       method: "encrypt",
-      params: [message, publicKeys],
+      params: [message, publicKeys].filter(Boolean),
     });
     return resp as EncryptedPayload[];
   }
