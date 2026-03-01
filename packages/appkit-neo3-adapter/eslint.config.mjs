@@ -6,7 +6,16 @@ import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 export const baseConfig = defineConfig(
   globalIgnores(["dist", "node_modules"]),
   eslint.configs.recommended,
-  tseslint.configs.recommended,
+  {
+    ...tseslint.configs.recommended,
+    languageOptions: {
+      ...tseslint.configs.recommended.languageOptions,
+      parserOptions: {
+        ...tseslint.configs.recommended.languageOptions.parserOptions,
+        tsconfigRootDir: __dirname,
+      },
+    }
+  },
   {
     rules: {
       "@typescript-eslint/no-require-imports": "off",
