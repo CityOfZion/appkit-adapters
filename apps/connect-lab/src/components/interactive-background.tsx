@@ -40,7 +40,11 @@ export function InteractiveBackground() {
   }, [])
 
   return (
-    <div ref={containerRef} className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden">
+    <div
+      ref={containerRef}
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden"
+    >
       {renderIcons.map(item => {
         // ...existing position logic...
         const iconGlobalX = (item.x / 100) * (typeof window !== 'undefined' ? window.innerWidth : 1000)

@@ -23,7 +23,10 @@ function Trigger({ className, children, ...props }: React.ComponentProps<typeof 
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="text-muted-foreground size-4 transition-transform group-aria-expanded:rotate-180" />
+        <ChevronDownIcon
+          aria-hidden
+          className="text-muted-foreground size-4 transition-transform group-aria-expanded:rotate-180"
+        />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   )
@@ -82,7 +85,7 @@ function Item({ className, children, ...props }: React.ComponentProps<typeof Sel
     >
       <span data-slot="select-item-indicator" className="absolute right-2 flex size-3.5 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
+          <CheckIcon aria-hidden className="size-4" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -97,7 +100,7 @@ function ScrollUpButton({ className, ...props }: React.ComponentProps<typeof Sel
       className={StyleHelper.merge('flex cursor-default items-center justify-center py-1', className)}
       {...props}
     >
-      <ChevronUpIcon className="size-4" />
+      <ChevronUpIcon aria-hidden className="size-4" />
     </SelectPrimitive.ScrollUpButton>
   )
 }

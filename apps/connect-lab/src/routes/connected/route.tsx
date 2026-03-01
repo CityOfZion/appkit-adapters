@@ -115,7 +115,7 @@ function RouteComponent() {
                 </Fragment>
               ) : (
                 <Fragment>
-                  <Unlink className="size-4" />
+                  <Unlink aria-hidden className="size-4" />
                   Disconnect
                 </Fragment>
               )}
@@ -149,11 +149,11 @@ function RouteComponent() {
 
               <Tabs.List>
                 <Tabs.Trigger value="methods">
-                  <Send />
+                  <Send aria-hidden />
                   Methods
                 </Tabs.Trigger>
                 <Tabs.Trigger value="custom">
-                  <Command />
+                  <Command aria-hidden />
                   Custom
                 </Tabs.Trigger>
               </Tabs.List>

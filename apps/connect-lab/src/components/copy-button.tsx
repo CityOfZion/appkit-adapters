@@ -20,13 +20,17 @@ export function CopyButton({ content, ...props }: TProps) {
   }
 
   return (
-    <Button variant="ghost" size="icon-sm" {...props} onClick={handleCopy}>
+    <Button aria-label="Copy to clipboard" variant="ghost" size="icon-sm" {...props} onClick={handleCopy}>
       <span className="relative">
         <Check
+          aria-hidden
           className={`absolute size-4 transition-opacity duration-300 ${hasCopied ? 'opacity-100' : 'opacity-0'}`}
         />
 
-        <Copy className={`size-4 transition-opacity duration-300 ${hasCopied ? 'opacity-0' : 'opacity-100'}`} />
+        <Copy
+          aria-hidden
+          className={`size-4 transition-opacity duration-300 ${hasCopied ? 'opacity-0' : 'opacity-100'}`}
+        />
       </span>
     </Button>
   )

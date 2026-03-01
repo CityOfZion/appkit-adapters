@@ -17,6 +17,7 @@ export function AnimatedAppLogo({ className, ...props }: ComponentProps<'div'>) 
 
   return (
     <div
+      aria-hidden
       className={StyleHelper.merge(
         'animate-in fade-in slide-in-from-bottom-20 flex flex-col items-center justify-center duration-500',
         {

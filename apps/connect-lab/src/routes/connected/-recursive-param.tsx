@@ -105,8 +105,9 @@ export function RecursiveParam({ node, onUpdate, onDelete, isRoot = false, isObj
               className="size-12 text-blue-500 hover:text-blue-500 max-sm:size-8 max-sm:rounded-lg max-sm:text-xs dark:border-blue-500/25 dark:hover:bg-blue-500/10"
               variant="outline"
               size="icon"
+              aria-label="Add child"
             >
-              <Plus className="size-5 max-sm:size-4" />
+              <Plus aria-hidden className="size-5 max-sm:size-4" />
             </Button>
           )}
 
@@ -115,9 +116,10 @@ export function RecursiveParam({ node, onUpdate, onDelete, isRoot = false, isObj
               className="size-12 text-red-500 hover:text-red-500 max-sm:size-8 max-sm:rounded-lg dark:border-red-500/25 dark:hover:bg-red-500/10"
               variant="ghost"
               size="icon"
+              aria-label="Delete node"
               onClick={onDelete}
             >
-              <Trash2 className="size-5 max-sm:size-4" />
+              <Trash2 aria-hidden className="size-5 max-sm:size-4" />
             </Button>
           )}
         </div>
@@ -127,7 +129,7 @@ export function RecursiveParam({ node, onUpdate, onDelete, isRoot = false, isObj
         <div className="space-y-2">
           {node.children?.length === 0 && (
             <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/40 py-3 opacity-20 max-sm:py-1.5">
-              <Circle className="size-2 fill-current" />
+              <Circle aria-hidden className="size-2 fill-current" />
               <span className="font-grotesk text-xs font-bold uppercase italic">Empty {node.type}</span>
             </div>
           )}

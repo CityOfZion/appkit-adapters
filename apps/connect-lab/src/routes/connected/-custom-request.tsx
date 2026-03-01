@@ -111,7 +111,7 @@ export function CustomRequest() {
 
           <ImportJsonModal onConfirm={handleImportJson}>
             <Button variant="outline" size="sm">
-              <ClipboardPaste className="size-4" />
+              <ClipboardPaste aria-hidden className="size-4" />
               Import JSON
             </Button>
           </ImportJsonModal>
@@ -128,7 +128,7 @@ export function CustomRequest() {
       </div>
 
       <Button className="h-12" variant="default" onClick={handleExecute} disabled={!method.trim()}>
-        <Play className="fill-current" />
+        <Play aria-hidden className="fill-current" />
         Execute
       </Button>
     </div>

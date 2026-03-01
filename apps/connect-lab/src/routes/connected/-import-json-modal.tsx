@@ -1,9 +1,10 @@
-import { ClipboardPaste, RefreshCw } from 'lucide-react'
+import { ClipboardPaste } from 'lucide-react'
 import { useState } from 'react'
 import type { ChangeEvent, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
+import { Spinner } from '@/components/ui/spinner'
 
 type TProps = {
   children: ReactNode
@@ -76,7 +77,7 @@ export function ImportJsonModal({ children, onConfirm }: TProps) {
           </div>
 
           <Button onClick={handleConfirm} className="mt-5 h-12" disabled={loading || !json.length}>
-            {loading ? <RefreshCw className="size-4 animate-spin" /> : 'Import'}
+            {loading ? <Spinner className="size-4" /> : 'Import'}
           </Button>
         </Dialog.Body>
       </Dialog.Content>

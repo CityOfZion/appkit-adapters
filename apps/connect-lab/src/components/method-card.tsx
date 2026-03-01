@@ -25,9 +25,9 @@ export function MethodCard({ name, docUrl, description, onPlay }: TProps) {
         {docUrl && (
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button size="icon-sm" variant="outline" asChild>
+              <Button size="icon-sm" aria-label="View documentation" variant="outline" asChild>
                 <Link to={docUrl} target="_blank" rel="noopener noreferrer">
-                  <BookOpen className="size-4" />
+                  <BookOpen aria-hidden className="size-4" />
                 </Link>
               </Button>
             </Tooltip.Trigger>

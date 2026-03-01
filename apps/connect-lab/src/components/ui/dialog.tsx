@@ -20,8 +20,8 @@ function Portal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal
 function Close({ ...props }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return (
     <DialogPrimitive.Close data-slot="dialog-close" asChild {...props}>
-      <Button variant="ghost" size="icon">
-        <X />
+      <Button variant="ghost" size="icon" aria-label="Close">
+        <X aria-hidden />
         <span className="sr-only">Close</span>
       </Button>
     </DialogPrimitive.Close>

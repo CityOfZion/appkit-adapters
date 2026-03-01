@@ -21,7 +21,7 @@ export function RequestModal() {
         >
           <Dialog.Header className="w-full flex-row items-center">
             <div className="rounded-lg bg-blue-500/10 p-2">
-              <Code className="size-4 text-blue-400" />
+              <Code aria-hidden className="size-4 text-blue-400" />
             </div>
 
             <div className="flex grow flex-col justify-center">

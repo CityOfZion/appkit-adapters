@@ -1,11 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import { RefreshCw } from 'lucide-react'
 import { InteractiveBackground } from '@/components/interactive-background'
 import { ChainHelper } from '@/helpers/chain'
 import { useConnection } from '@/hooks/use-connection'
 import { AnimatedAppLogo } from '@/components/app-logo'
 import { UtilsHelper } from '@/helpers/utils'
+import { Spinner } from '@/components/ui/spinner'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -38,7 +38,7 @@ function App() {
 
       {connectionInfo.status !== 'not_connected' ? (
         <div className="animate-in fade-in slide-in-from-bottom-20 mt-12 flex flex-col items-center duration-500">
-          <RefreshCw className="size-8 animate-spin text-blue-500" />
+          <Spinner className="size-8 animate-spin text-blue-500" />
 
           {connectionInfo.status === 'connecting' ? (
             <div className="mt-4 flex flex-col items-center">
