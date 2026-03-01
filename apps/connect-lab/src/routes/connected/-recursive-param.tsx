@@ -1,8 +1,8 @@
+import { Circle, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { StyleHelper } from '@/helpers/style'
-import { Circle, Plus, Trash2 } from 'lucide-react'
 
 export type TNodeType = 'string' | 'number' | 'array' | 'object'
 
@@ -11,7 +11,7 @@ export type TParamNode = {
   type: TNodeType
   value?: string
   key?: string
-  children?: TParamNode[]
+  children?: Array<TParamNode>
 }
 
 type TProps = {
@@ -23,7 +23,7 @@ type TProps = {
 }
 
 export function RecursiveParam({ node, onUpdate, onDelete, isRoot = false, isObjectChild = false }: TProps) {
-  const handleChangeType = (newType: TNodeType) => {
+  function handleChangeType(newType: TNodeType) {
     const newNode: TParamNode = { ...node, type: newType }
     if (newType === 'array' || newType === 'object') {
       newNode.children = []
@@ -35,7 +35,7 @@ export function RecursiveParam({ node, onUpdate, onDelete, isRoot = false, isObj
     onUpdate(newNode)
   }
 
-  const addChild = () => {
+  function addChild() {
     const children = [
       ...(node.children || []),
       {
@@ -48,12 +48,12 @@ export function RecursiveParam({ node, onUpdate, onDelete, isRoot = false, isObj
     onUpdate({ ...node, children })
   }
 
-  const updateChild = (childId: number, updatedChild: TParamNode) => {
+  function updateChild(childId: number, updatedChild: TParamNode) {
     const children = node.children?.map(c => (c.id === childId ? updatedChild : c)) || []
     onUpdate({ ...node, children })
   }
 
-  const deleteChild = (childId: number) => {
+  function deleteChild(childId: number) {
     const children = node.children?.filter(c => c.id !== childId) || []
     onUpdate({ ...node, children })
   }

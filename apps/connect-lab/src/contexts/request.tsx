@@ -1,63 +1,61 @@
-import { createContext, useState, type Dispatch } from "react";
+import { createContext, useState } from 'react'
+import type { Dispatch } from 'react'
 
 export type TRequestState =
   | {
-      status: "idle";
+      status: 'idle'
     }
   | {
-      status: "loading";
-      method: string;
+      status: 'loading'
+      method: string
     }
   | {
-      status: "error" | "success";
-      method: string;
-      data: any;
-    };
+      status: 'error' | 'success'
+      method: string
+      data: any
+    }
 
 type TRequestProviderState = {
-  requestState: TRequestState;
-  setRequestState: Dispatch<React.SetStateAction<TRequestState>>;
-  request: (method: string, call: () => Promise<any>) => Promise<void>;
-};
+  requestState: TRequestState
+  setRequestState: Dispatch<React.SetStateAction<TRequestState>>
+  request: (method: string, call: () => Promise<any>) => Promise<void>
+}
 
 type RequestProviderProps = {
-  children: React.ReactNode;
-};
+  children: React.ReactNode
+}
 
-export const RequestProviderContext =
-  createContext<TRequestProviderState | null>(null);
+export const RequestProviderContext = createContext<TRequestProviderState | null>(null)
 
 export function RequestProvider({ children }: RequestProviderProps) {
   const [requestState, setRequestState] = useState<TRequestState>({
-    status: "idle",
-  });
+    status: 'idle',
+  })
 
   async function request(method: string, call: () => Promise<any>) {
     try {
-      setRequestState({ status: "loading", method });
+      setRequestState({ status: 'loading', method })
 
-      const response = await call();
+      const response = await call()
 
       setRequestState({
-        status: "success",
+        status: 'success',
         method,
         data: response,
-      });
+      })
     } catch (error) {
-      console.error(error);
+      console.error(error)
       setRequestState({
-        status: "error",
+        status: 'error',
         method,
         data: { error: error instanceof Error ? error.message : error },
-      });
+      })
     }
   }
 
   return (
-    <RequestProviderContext.Provider
-      value={{ request, requestState, setRequestState }}
-    >
+    <RequestProviderContext.Provider value={{ request, requestState, setRequestState }}>
       {children}
     </RequestProviderContext.Provider>
-  );
+  )
 }

@@ -1,8 +1,8 @@
+import { Code } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
 import { useRequest } from '@/hooks/use-request'
-import { Code } from 'lucide-react'
 import { StyleHelper } from '@/helpers/style'
 import { CopyButton } from '@/components/copy-button'
 

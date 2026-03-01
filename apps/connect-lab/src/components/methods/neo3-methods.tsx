@@ -1,182 +1,175 @@
-import { wallet } from "@cityofzion/neon-js";
-import { type Neo3Provider } from "@cityofzion/appkit-neo3-adapter";
+import { wallet } from '@cityofzion/neon-js'
 
-import { MethodCard } from "@/components/method-card";
-import { useRequest } from "@/hooks/use-request";
-import { SignMessageVersion } from "@cityofzion/neon-dappkit-types";
-import { useAppKitProvider } from "@reown/appkit/react";
-import { Fragment } from "react";
-import { useConnection } from "@/hooks/use-connection";
+import { SignMessageVersion } from '@cityofzion/neon-dappkit-types'
+import { useAppKitProvider } from '@reown/appkit/react'
+import { Fragment } from 'react'
+import type { Neo3Provider } from '@cityofzion/appkit-neo3-adapter'
+import { useRequest } from '@/hooks/use-request'
+import { MethodCard } from '@/components/method-card'
+import { useConnection } from '@/hooks/use-connection'
 
 export function Neo3Methods() {
-  const { request } = useRequest();
+  const { request } = useRequest()
   const {
     connectionInfo: { address, namespace },
-  } = useConnection<true>();
-  const { walletProvider } = useAppKitProvider<Neo3Provider>(namespace);
+  } = useConnection<true>()
+  const { walletProvider } = useAppKitProvider<Neo3Provider>(namespace)
 
   function sendInvokeFunction() {
-    request("invokeFunction", async () =>
+    request('invokeFunction', async () =>
       walletProvider.invokeFunction({
         invocations: [
           {
-            scriptHash: "0xd2a4cff31913016155e38e474a2c06d08be276cf",
-            operation: "transfer",
+            scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf',
+            operation: 'transfer',
             args: [
               {
-                type: "Hash160",
-                value: address ?? "",
+                type: 'Hash160',
+                value: address,
               },
               {
-                type: "Hash160",
-                value: "NbnjKGMBJzJ6j5PHeYhjJDaQ5Vy5UYu4Fv",
+                type: 'Hash160',
+                value: address,
               },
               {
-                type: "Integer",
-                value: "100000000",
+                type: 'Integer',
+                value: '100000000',
               },
               {
-                type: "Array",
+                type: 'Array',
                 value: [],
               },
             ],
           },
         ],
         signers: [{ scopes: 1 }],
-      }),
-    );
+      })
+    )
   }
 
   function sendTestInvoke() {
-    request("testInvoke", async () =>
+    request('testInvoke', async () =>
       walletProvider.testInvoke({
         invocations: [
           {
-            scriptHash: "0xd2a4cff31913016155e38e474a2c06d08be276cf",
-            operation: "balanceOf",
+            scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf',
+            operation: 'balanceOf',
             args: [
               {
-                type: "Hash160",
-                value: address ?? "",
+                type: 'Hash160',
+                value: address,
               },
             ],
           },
         ],
         signers: [{ scopes: 1 }],
-      }),
-    );
+      })
+    )
   }
 
   function sendCalculateFee() {
-    request("calculateFee", async () =>
+    request('calculateFee', async () =>
       walletProvider.calculateFee({
         invocations: [
           {
-            scriptHash: "0xd2a4cff31913016155e38e474a2c06d08be276cf",
-            operation: "transfer",
+            scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf',
+            operation: 'transfer',
             args: [
               {
-                type: "Hash160",
-                value: address ?? "",
+                type: 'Hash160',
+                value: address,
               },
               {
-                type: "Hash160",
-                value: "NbnjKGMBJzJ6j5PHeYhjJDaQ5Vy5UYu4Fv",
+                type: 'Hash160',
+                value: address,
               },
               {
-                type: "Integer",
-                value: "100000000",
+                type: 'Integer',
+                value: '100000000',
               },
               {
-                type: "Array",
+                type: 'Array',
                 value: [],
               },
             ],
           },
         ],
         signers: [{ scopes: 1 }],
-      }),
-    );
+      })
+    )
   }
 
   function sendSignTransaction() {
-    request("signTransaction", async () => {
-      const payer = new wallet.Account(address);
-      const owner = new wallet.Account("NbHReXhURGYsochk4uYt7StMAurdEn8Yor");
+    request('signTransaction', async () => {
+      const payer = new wallet.Account(address)
+      const owner = new wallet.Account('NbHReXhURGYsochk4uYt7StMAurdEn8Yor')
 
       return walletProvider.signTransaction({
         invocations: [
           {
-            scriptHash: "0xd2a4cff31913016155e38e474a2c06d08be276cf",
-            operation: "transfer",
+            scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf',
+            operation: 'transfer',
             args: [
               // the owner is sending to payer but the payer is paying for the tx
-              { type: "Hash160", value: owner.address }, // owner address
-              { type: "Hash160", value: payer.address }, // payer address
-              { type: "Integer", value: "100000000" },
-              { type: "Array", value: [] },
+              { type: 'Hash160', value: owner.address }, // owner address
+              { type: 'Hash160', value: payer.address }, // payer address
+              { type: 'Integer', value: '100000000' },
+              { type: 'Array', value: [] },
             ],
           },
         ],
         signers: [
-          { account: payer.scriptHash, scopes: "CalledByEntry" },
-          { account: owner.scriptHash, scopes: "CalledByEntry" },
+          { account: payer.scriptHash, scopes: 'CalledByEntry' },
+          { account: owner.scriptHash, scopes: 'CalledByEntry' },
         ],
-      });
-    });
+      })
+    })
   }
 
   function sendSignMessage() {
-    request("signMessage", async () =>
+    request('signMessage', async () =>
       walletProvider.signMessage({
         message: `Hello, ${address}`,
         version: SignMessageVersion.DEFAULT,
-      }),
-    );
+      })
+    )
   }
 
   function sendVerifyMessage() {
-    request("verifyMessage", async () => {
+    request('verifyMessage', async () => {
       const signedMessage = await walletProvider.signMessage({
         message: `Hello, ${address}`,
         version: SignMessageVersion.DEFAULT,
-      });
+      })
 
-      return await walletProvider.verifyMessage(signedMessage);
-    });
+      return await walletProvider.verifyMessage(signedMessage)
+    })
   }
 
   function sendGetWalletInfo() {
-    request("getWalletInfo", async () => walletProvider.getWalletInfo());
+    request('getWalletInfo', async () => walletProvider.getWalletInfo())
   }
 
-  const sendEncrypt = async () => {
-    request("encrypt", async () => walletProvider.encrypt("My secret message"));
-  };
+  function sendEncrypt() {
+    request('encrypt', async () => walletProvider.encrypt('My secret message'))
+  }
 
-  const sendDecrypt = async () => {
-    request("decrypt", async () => {
-      const [encryptedMessage] =
-        await walletProvider.encrypt("My secret message");
-      return walletProvider.decrypt(encryptedMessage);
-    });
-  };
+  function sendDecrypt() {
+    request('decrypt', async () => {
+      const [encryptedMessage] = await walletProvider.encrypt('My secret message')
+      return walletProvider.decrypt(encryptedMessage)
+    })
+  }
 
-  const sendDecryptFromArray = async () => {
-    request("decrypt", async () => {
-      const [encryptedMessage] =
-        await walletProvider.encrypt("My secret message");
+  function sendDecryptFromArray() {
+    request('decrypt', async () => {
+      const [encryptedMessage] = await walletProvider.encrypt('My secret message')
 
-      const [encryptedMessage2] = await walletProvider.encrypt(
-        "My second secret message",
-      );
+      const [encryptedMessage2] = await walletProvider.encrypt('My second secret message')
 
-      return walletProvider.decryptFromArray([
-        encryptedMessage,
-        encryptedMessage2,
-      ]);
-    });
-  };
+      return walletProvider.decryptFromArray([encryptedMessage, encryptedMessage2])
+    })
+  }
 
   return (
     <Fragment>
@@ -269,5 +262,5 @@ export function Neo3Methods() {
         />
       </li>
     </Fragment>
-  );
+  )
 }

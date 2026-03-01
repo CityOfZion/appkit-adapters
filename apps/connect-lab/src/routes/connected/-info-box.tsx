@@ -1,5 +1,6 @@
+import { Fragment } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { StyleHelper } from '@/helpers/style'
-import { Fragment, type ComponentProps, type ReactNode } from 'react'
 
 type TProps = {
   label?: ReactNode

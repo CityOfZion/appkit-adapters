@@ -1,8 +1,9 @@
+import { ClipboardPaste, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import { ClipboardPaste, RefreshCw } from 'lucide-react'
-import { useState, type ChangeEvent, type ReactNode } from 'react'
 
 type TProps = {
   children: ReactNode
@@ -31,7 +32,7 @@ export function ImportJsonModal({ children, onConfirm }: TProps) {
       onConfirm?.(json)
       setIsOpen(false)
       setJson('')
-    } catch (error) {
+    } catch {
       setError('Invalid JSON. Please check your input and try again.')
     } finally {
       setLoading(false)

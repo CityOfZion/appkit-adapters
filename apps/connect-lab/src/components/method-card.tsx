@@ -1,27 +1,23 @@
-import { BookOpen } from "lucide-react";
-import { Button } from "./ui/button";
-import { Tooltip } from "./ui/tooltip";
-import { Link } from "@tanstack/react-router";
+import { BookOpen } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Button } from './ui/button'
+import { Tooltip } from './ui/tooltip'
 
 type TProps = {
-  name: string;
-  docUrl?: string;
-  description: string;
-  onPlay?: () => void;
-};
+  name: string
+  docUrl?: string
+  description: string
+  onPlay?: () => void
+}
 
 export function MethodCard({ name, docUrl, description, onPlay }: TProps) {
   return (
-    <div className="relative flex flex-col p-4 gap-2 items-start rounded-2xl transition-all duration-300 border border-white/5 backdrop-blur-xs h-full">
-      <p className="font-black capitalize font-sans text-sm text-white  truncate">
-        {name}
-      </p>
+    <div className="relative flex h-full flex-col items-start gap-2 rounded-2xl border border-white/5 p-4 backdrop-blur-xs transition-all duration-300">
+      <p className="truncate font-sans text-sm font-black text-white capitalize">{name}</p>
 
-      <p className="text-[0.625rem] tracking-wider font-bold text-slate-500">
-        {description}
-      </p>
+      <p className="text-[0.625rem] font-bold tracking-wider text-slate-500">{description}</p>
 
-      <div className="flex gap-1 w-full mt-auto">
+      <div className="mt-auto flex w-full gap-1">
         <Button size="sm" className="grow" variant="default" onClick={onPlay}>
           Execute
         </Button>
@@ -43,5 +39,5 @@ export function MethodCard({ name, docUrl, description, onPlay }: TProps) {
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -1,109 +1,104 @@
-import { MethodCard } from "@/components/method-card";
-import { useConnection } from "@/hooks/use-connection";
-import { useRequest } from "@/hooks/use-request";
-import {
-  useAppKitConnection,
-  type Provider,
-} from "@reown/appkit-adapter-solana/react";
-import { useAppKitProvider } from "@reown/appkit/react";
-import * as solanaSDK from "@solana/web3.js";
-import bs58 from "bs58";
-import { Fragment } from "react";
+import { useAppKitConnection } from '@reown/appkit-adapter-solana/react'
+import { useAppKitProvider } from '@reown/appkit/react'
+import * as solanaSDK from '@solana/web3.js'
+import bs58 from 'bs58'
+import { Fragment } from 'react'
+import type { Provider } from '@reown/appkit-adapter-solana/react'
+import { useRequest } from '@/hooks/use-request'
+import { useConnection } from '@/hooks/use-connection'
+import { MethodCard } from '@/components/method-card'
 
 export function SolanaMethods() {
-  const { request } = useRequest();
+  const { request } = useRequest()
   const {
     connectionInfo: { address, namespace },
-  } = useConnection<true>();
+  } = useConnection<true>()
 
-  const { walletProvider } = useAppKitProvider<Provider>(namespace);
-  const { connection } = useAppKitConnection();
+  const { walletProvider } = useAppKitProvider<Provider>(namespace)
+  const { connection } = useAppKitConnection()
 
-  async function sendSignAndSendTransaction() {
-    request("solana_signAndSendTransaction", async () => {
-      if (!address || !connection) return;
+  function sendSignAndSendTransaction() {
+    request('solana_signAndSendTransaction', async () => {
+      if (!address || !connection) return
 
-      const wallet = new solanaSDK.PublicKey(address!);
+      const wallet = new solanaSDK.PublicKey(address)
 
-      const latestBlockhash = await connection.getLatestBlockhash();
+      const latestBlockhash = await connection.getLatestBlockhash()
 
-      const transaction = new solanaSDK.Transaction();
-      transaction.recentBlockhash = latestBlockhash.blockhash;
-      transaction.feePayer = wallet;
+      const transaction = new solanaSDK.Transaction()
+      transaction.recentBlockhash = latestBlockhash.blockhash
+      transaction.feePayer = wallet
 
       transaction.add(
         solanaSDK.SystemProgram.transfer({
           fromPubkey: wallet,
           toPubkey: wallet,
           lamports: 1,
-        }),
-      );
+        })
+      )
 
-      return await walletProvider.signAndSendTransaction(transaction);
-    });
+      return await walletProvider.signAndSendTransaction(transaction)
+    })
   }
 
   function sendSignTransaction() {
-    request("solana_signTransaction", async () => {
-      if (!address || !connection) return;
+    request('solana_signTransaction', async () => {
+      if (!address || !connection) return
 
-      const wallet = new solanaSDK.PublicKey(address!);
+      const wallet = new solanaSDK.PublicKey(address)
 
-      const latestBlockhash = await connection.getLatestBlockhash();
+      const latestBlockhash = await connection.getLatestBlockhash()
 
-      const transaction = new solanaSDK.Transaction();
-      transaction.recentBlockhash = latestBlockhash.blockhash;
-      transaction.feePayer = wallet;
+      const transaction = new solanaSDK.Transaction()
+      transaction.recentBlockhash = latestBlockhash.blockhash
+      transaction.feePayer = wallet
 
       transaction.add(
         solanaSDK.SystemProgram.transfer({
           fromPubkey: wallet,
           toPubkey: wallet,
           lamports: 1,
-        }),
-      );
+        })
+      )
 
-      return await walletProvider.signTransaction(transaction);
-    });
+      return await walletProvider.signTransaction(transaction)
+    })
   }
 
   function sendSignAllTransaction() {
-    request("solana_signTransaction", async () => {
-      if (!address || !connection) return;
+    request('solana_signTransaction', async () => {
+      if (!address || !connection) return
 
-      const wallet = new solanaSDK.PublicKey(address!);
+      const wallet = new solanaSDK.PublicKey(address)
 
-      const latestBlockhash = await connection.getLatestBlockhash();
+      const latestBlockhash = await connection.getLatestBlockhash()
 
-      const transaction = new solanaSDK.Transaction();
-      transaction.recentBlockhash = latestBlockhash.blockhash;
-      transaction.feePayer = wallet;
+      const transaction = new solanaSDK.Transaction()
+      transaction.recentBlockhash = latestBlockhash.blockhash
+      transaction.feePayer = wallet
 
       transaction.add(
         solanaSDK.SystemProgram.transfer({
           fromPubkey: wallet,
           toPubkey: wallet,
           lamports: 1,
-        }),
-      );
+        })
+      )
 
-      return await walletProvider.signAllTransactions([transaction]);
-    });
+      return await walletProvider.signAllTransactions([transaction])
+    })
   }
 
   function sendSignMessage() {
-    request("solana_signMessage", async () => {
-      const encodedMessage = new TextEncoder().encode(`Hello, ${address}`);
-      const signedMessage = await walletProvider.signMessage(encodedMessage);
-      return bs58.encode(signedMessage);
-    });
+    request('solana_signMessage', async () => {
+      const encodedMessage = new TextEncoder().encode(`Hello, ${address}`)
+      const signedMessage = await walletProvider.signMessage(encodedMessage)
+      return bs58.encode(signedMessage)
+    })
   }
 
   function sendGetAccounts() {
-    request(
-      "solana_getAccounts",
-      async () => await walletProvider.getAccounts(),
-    );
+    request('solana_getAccounts', async () => await walletProvider.getAccounts())
   }
 
   return (
@@ -153,5 +148,5 @@ export function SolanaMethods() {
         />
       </li>
     </Fragment>
-  );
+  )
 }

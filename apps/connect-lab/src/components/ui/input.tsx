@@ -1,5 +1,5 @@
-import { StyleHelper } from '@/helpers/style'
 import * as React from 'react'
+import { StyleHelper } from '@/helpers/style'
 
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   return (

@@ -1,21 +1,23 @@
-import { InteractiveBackground } from '@/components/interactive-background'
+import { Link, Navigate, createFileRoute } from '@tanstack/react-router'
+import { Command, Send, Unlink } from 'lucide-react'
+import { Fragment, useTransition } from 'react'
 import { RequestModal } from './-request-modal'
+import { InfoBox } from './-info-box'
+import { CustomRequest } from './-custom-request'
+import type { TSupportedChain } from '@/helpers/chain'
+import type { ComponentType } from 'react'
+import { InteractiveBackground } from '@/components/interactive-background'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { ChainHelper, type TSupportedChain } from '@/helpers/chain'
+import { ChainHelper } from '@/helpers/chain'
 import { useConnection } from '@/hooks/use-connection'
 import { EIP155Methods } from '@/components/methods/eip155-methods'
 import { SolanaMethods } from '@/components/methods/solana-methods'
 import { Neo3Methods } from '@/components/methods/neo3-methods'
 import { StellarMethods } from '@/components/methods/stellar-methods'
 
-import { createFileRoute, Link, Navigate } from '@tanstack/react-router'
-import { Command, Send, Unlink } from 'lucide-react'
-import { useTransition, Fragment, type ComponentType } from 'react'
-import { InfoBox } from './-info-box'
 import { NeoxMethods } from '@/components/methods/neox-methods'
 import { Tabs } from '@/components/ui/tabs'
-import { CustomRequest } from './-custom-request'
 import { Tooltip } from '@/components/ui/tooltip'
 import { CopyButton } from '@/components/copy-button'
 
@@ -37,7 +39,7 @@ const methodsComponentByChain: Record<TSupportedChain, ComponentType> = {
 }
 
 function RouteComponent() {
-  const { connectionInfo, disconnect } = useConnection<true>()
+  const { connectionInfo, disconnect } = useConnection()
 
   const [isDisconnecting, startDisconnect] = useTransition()
 
@@ -49,7 +51,9 @@ function RouteComponent() {
   const ChainIcon = ChainHelper.iconsByChain[connectionInfo.chain]
   const chainColor = ChainHelper.colorsByChain[connectionInfo.chain]
 
-  const addressExplorerUrl = ChainHelper.addressExplorerUrlsByChain[connectionInfo.chain][connectionInfo.networkId]
+  const addressExplorerUrl = ChainHelper.addressExplorerUrlsByChain[connectionInfo.chain][connectionInfo.networkId] as
+    | string
+    | undefined
   const replacedAddressExplorerUrl = addressExplorerUrl?.replace('{address}', connectionInfo.address)
 
   return (

@@ -1,6 +1,7 @@
-import { Copy, Check } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from './ui/button'
-import { useState, type ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 
 type TProps = {
   content: any

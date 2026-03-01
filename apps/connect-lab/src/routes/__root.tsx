@@ -1,14 +1,14 @@
-import { ThemeProvider } from "@/contexts/theme";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-import { Outlet, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { RequestProvider } from "@/contexts/request";
-import { ConnectionProvider } from "@/contexts/connection";
-import { AppKitHelper } from "@/helpers/appkit";
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { ThemeProvider } from '@/contexts/theme'
+import { RequestProvider } from '@/contexts/request'
+import { ConnectionProvider } from '@/contexts/connection'
+import { AppKitHelper } from '@/helpers/appkit'
 
-import "./styles.css";
+import './styles.css'
 
-AppKitHelper.setup();
+AppKitHelper.setup()
 
 export const Route = createRootRoute({
   component: () => (
@@ -20,14 +20,14 @@ export const Route = createRootRoute({
       </ConnectionProvider>
 
       <TanStackDevtools
-        config={{ position: "bottom-right" }}
+        config={{ position: 'bottom-right' }}
         plugins={[
           {
-            name: "Tanstack Router",
+            name: 'Tanstack Router',
             render: <TanStackRouterDevtoolsPanel />,
           },
         ]}
       />
     </ThemeProvider>
   ),
-});
+})

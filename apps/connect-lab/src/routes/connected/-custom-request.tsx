@@ -1,15 +1,16 @@
+import { useAppKitProvider } from '@reown/appkit-controllers/react'
+import { ClipboardPaste, Play } from 'lucide-react'
+import { useState } from 'react'
+import { RecursiveParam } from './-recursive-param'
+import { ImportJsonModal } from './-import-json-modal'
+import type { Provider } from '@reown/appkit-controllers'
+import type { TParamNode } from './-recursive-param'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 import { useConnection } from '@/hooks/use-connection'
 import { useRequest } from '@/hooks/use-request'
-import type { Provider } from '@reown/appkit-controllers'
-import { useAppKitProvider } from '@reown/appkit-controllers/react'
-import { ClipboardPaste, Play } from 'lucide-react'
-import { useState } from 'react'
-import { RecursiveParam, type TParamNode } from './-recursive-param'
-import { ImportJsonModal } from './-import-json-modal'
 
 const convertJsonToParamNode = (data: any, key?: string): TParamNode => {
   const id = Date.now() + Math.random()
@@ -21,42 +22,53 @@ const convertJsonToParamNode = (data: any, key?: string): TParamNode => {
       key,
       children: data.map(item => convertJsonToParamNode(item)),
     }
-  } else if (data !== null && typeof data === 'object') {
+  }
+
+  if (data !== null && typeof data === 'object') {
     return {
       id,
       type: 'object',
       key,
       children: Object.entries(data).map(([k, v]) => convertJsonToParamNode(v, k)),
     }
-  } else if (typeof data === 'number') {
+  }
+
+  if (typeof data === 'number') {
     return {
       id,
       type: 'number',
       value: String(data),
       key,
     }
-  } else {
-    return {
-      id,
-      type: 'string',
-      value: String(data),
-      key,
-    }
+  }
+
+  return {
+    id,
+    type: 'string',
+    value: String(data),
+    key,
   }
 }
 
 const serializeNode = (node: TParamNode): any => {
-  if (node.type === 'string') return node.value
-  if (node.type === 'number') return Number(node.value)
-  if (node.type === 'array') return node.children?.map(serializeNode) || []
-  if (node.type === 'object') {
-    const obj: Record<string, any> = {}
-    node.children?.forEach(child => {
-      if (child.key) obj[child.key] = serializeNode(child)
-    })
-    return obj
+  if (node.type === 'string') {
+    return node.value
   }
-  return null
+
+  if (node.type === 'number') {
+    return Number(node.value)
+  }
+
+  if (node.type === 'array') {
+    return node.children?.map(serializeNode) || []
+  }
+
+  const obj: Record<string, any> = {}
+  node.children?.forEach(child => {
+    if (child.key) obj[child.key] = serializeNode(child)
+  })
+
+  return obj
 }
 
 export function CustomRequest() {

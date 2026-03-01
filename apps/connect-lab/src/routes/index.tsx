@@ -1,95 +1,89 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { InteractiveBackground } from "@/components/interactive-background";
-import { ChainHelper } from "@/helpers/chain";
-import { useConnection } from "@/hooks/use-connection";
-import { AnimatedAppLogo } from "@/components/app-logo";
-import { useEffect } from "react";
-import { UtilsHelper } from "@/helpers/utils";
-import { RefreshCw } from "lucide-react";
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { RefreshCw } from 'lucide-react'
+import { InteractiveBackground } from '@/components/interactive-background'
+import { ChainHelper } from '@/helpers/chain'
+import { useConnection } from '@/hooks/use-connection'
+import { AnimatedAppLogo } from '@/components/app-logo'
+import { UtilsHelper } from '@/helpers/utils'
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/')({
   component: App,
-});
+})
 
 function App() {
-  const { connect, connectionInfo } = useConnection();
-  const navigate = useNavigate();
+  const { connect, connectionInfo } = useConnection()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (connectionInfo.status !== "connected") return;
+    if (connectionInfo.status !== 'connected') return
     UtilsHelper.sleep(1500).then(() => {
-      navigate({ to: "/connected" });
-    });
-  }, [connectionInfo.status]);
+      navigate({ to: '/connected' })
+    })
+  }, [connectionInfo.status])
 
   return (
-    <div className="flex items-center h-screen w-scree flex-col relative px-10">
+    <div className="w-scree relative flex h-screen flex-col items-center px-10">
       <InteractiveBackground />
 
       <AnimatedAppLogo className="mt-36" />
 
-      <h1 className="text-7xl max-sm:text-4xl font-bold -tracking-widest font-grotesk mt-6 animate-in fade-in slide-in-from-bottom-20 duration-500">
+      <h1 className="font-grotesk animate-in fade-in slide-in-from-bottom-20 mt-6 text-7xl font-bold -tracking-widest duration-500 max-sm:text-4xl">
         Connect<span className="text-primary font-black">Lab</span>
       </h1>
 
-      <h2 className="mt-4 max-sm:text-base text-xl gap-2 flex text-center items-center font-bold max-w-md animate-in fade-in slide-in-from-bottom-20 duration-500">
+      <h2 className="animate-in fade-in slide-in-from-bottom-20 mt-4 flex max-w-md items-center gap-2 text-center text-xl font-bold duration-500 max-sm:text-base">
         A testing environment for your WalletConnect V2 integrations.
       </h2>
 
-      {connectionInfo.status !== "not_connected" ? (
-        <div className="flex mt-12 flex-col items-center animate-in fade-in slide-in-from-bottom-20 duration-500">
-          <RefreshCw className="text-blue-500 size-8 animate-spin " />
+      {connectionInfo.status !== 'not_connected' ? (
+        <div className="animate-in fade-in slide-in-from-bottom-20 mt-12 flex flex-col items-center duration-500">
+          <RefreshCw className="size-8 animate-spin text-blue-500" />
 
-          {connectionInfo.status === "connecting" ? (
-            <div className="flex flex-col mt-4 items-center">
-              <span className="text-lg font-bold text-white font-grotesk">
-                Reconnecting
-              </span>
+          {connectionInfo.status === 'connecting' ? (
+            <div className="mt-4 flex flex-col items-center">
+              <span className="font-grotesk text-lg font-bold text-white">Reconnecting</span>
 
-              <span className="text-sm text-slate-400 font-medium text-center">
-                Checking previous sessions...
-              </span>
+              <span className="text-center text-sm font-medium text-slate-400">Checking previous sessions...</span>
             </div>
           ) : (
-            <div className="flex flex-col mt-4 items-center animate-in fade-in slide-in-from-bottom-20 duration-500">
-              <span className="text-lg font-bold text-primary font-grotesk">
-                Connected
-              </span>
+            <div className="animate-in fade-in slide-in-from-bottom-20 mt-4 flex flex-col items-center duration-500">
+              <span className="text-primary font-grotesk text-lg font-bold">Connected</span>
 
-              <span className="text-sm text-slate-400 font-medium text-center">
+              <span className="text-center text-sm font-medium text-slate-400">
                 Redirecting to your connected dapp...
               </span>
             </div>
           )}
         </div>
       ) : (
-        <ul className="flex mt-12 flex-wrap justify-center gap-3 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-20 duration-500">
-          {ChainHelper.supportedChains.map((chain) => {
-            const Icon = ChainHelper.iconsByChain[chain];
-            const color = ChainHelper.colorsByChain[chain];
+        <ul className="animate-in fade-in slide-in-from-bottom-20 mx-auto mt-12 flex max-w-2xl flex-wrap justify-center gap-3 duration-500">
+          {ChainHelper.supportedChains.map(chain => {
+            const Icon = ChainHelper.iconsByChain[chain]
+            const color = ChainHelper.colorsByChain[chain]
 
             return (
               <li key={chain}>
                 <button
-                  className="group flex items-center gap-3 px-5 py-3 rounded-2xl border border-white/5 cursor-pointer shadow-lg relative overflow-hidden duration-300 transition-all hover:scale-105"
+                  className="group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border border-white/5 px-5 py-3 shadow-lg transition-all duration-300 hover:scale-105"
                   onClick={() => connect(chain)}
                 >
                   <div
-                    className="w-full h-full absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-300"
+                    className="absolute top-0 left-0 h-full w-full opacity-0 transition-all duration-300 group-hover:opacity-100"
                     style={{ backgroundColor: color }}
                   />
 
-                  <Icon className="size-6 relative" />
+                  <Icon className="relative size-6" />
 
-                  <span className="text-sm font-bold text-white uppercase tracking-widest font-brand relative">
+                  <span className="font-brand relative text-sm font-bold tracking-widest text-white uppercase">
                     {chain}
                   </span>
                 </button>
               </li>
-            );
+            )
           })}
         </ul>
       )}
     </div>
-  );
+  )
 }
