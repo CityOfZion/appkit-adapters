@@ -36,7 +36,7 @@ jobs:
         run: node common/scripts/install-run-rush.js rebuild --verbose
 
       - name: Publish packages to npm
-        run: node common/scripts/install-run-rush.js publish --apply --target-branch main --publish --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --add-commit-details --include-all
+        run: node common/scripts/install-run-rush.js publish --apply --target-branch main --publish --npm-auth-token ${{ secrets.NPM_TOKEN }} --add-commit-details --include-all
 
       - name: Commit and Push package.json version update
         run: |
