@@ -64,7 +64,7 @@ function RouteComponent() {
 
       <div className="flex min-h-screen w-full max-w-7xl flex-col gap-12 px-4 py-10">
         <header className="flex flex-col gap-4">
-          <div className="flex w-full min-w-0 gap-2 max-md:grid max-md:grid-cols-6 max-md:grid-rows-3">
+          <div className="flex w-full min-w-0 gap-2 max-md:grid max-md:grid-cols-6 max-md:grid-rows-3 md:h-13">
             <InfoBox className="items-center justify-center">
               <ChainIcon className="size-4 min-h-4 min-w-4" style={{ color: chainColor }} />
             </InfoBox>

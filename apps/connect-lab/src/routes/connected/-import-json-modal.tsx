@@ -67,7 +67,7 @@ export function ImportJsonModal({ children, onConfirm }: TProps) {
           <div className="flex flex-col gap-1">
             <Textarea
               data-error={!!error}
-              className="h-64"
+              className="h-64 overflow-y-auto"
               placeholder='e.g. { "to": "0x...", "value": "1000000000" }'
               value={json}
               onChange={handleChange}

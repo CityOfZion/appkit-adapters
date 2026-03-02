@@ -46,7 +46,7 @@ export function RequestModal() {
               </div>
             </Dialog.Body>
           ) : (
-            <Dialog.Body className="grow items-center py-5 text-center">
+            <Dialog.Body className="min-h-0 grow items-center py-5 text-center">
               <div
                 data-status={requestState.status}
                 className="relative w-full grow overflow-y-auto rounded-2xl border border-emerald-500/20 bg-black px-8 pt-12 pb-8 text-left text-emerald-400/90 backdrop-blur-lg data-[status=error]:border-red-500/20 data-[status=error]:bg-red-950/5 data-[status=error]:text-red-400/90"
