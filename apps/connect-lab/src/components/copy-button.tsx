@@ -11,7 +11,7 @@ export function CopyButton({ content, ...props }: TProps) {
   const [hasCopied, setHasCopied] = useState(false)
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(JSON.stringify(content, null, 2))
+    await navigator.clipboard.writeText(typeof content === 'object' ? JSON.stringify(content, null, 2) : content)
     setHasCopied(true)
 
     setTimeout(() => {
