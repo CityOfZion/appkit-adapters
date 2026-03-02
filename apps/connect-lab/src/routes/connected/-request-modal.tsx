@@ -32,7 +32,7 @@ export function RequestModal() {
               </p>
             </div>
 
-            <Dialog.Close />
+            {requestState.status !== 'loading' && <Dialog.Close />}
           </Dialog.Header>
 
           {requestState.status === 'loading' ? (
