@@ -61,7 +61,7 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
   }
 
   async function connect(chain: TSupportedChain) {
-    const namespace = ChainHelper.namespaceByChain[chain]
+    const namespace = ChainHelper.chainInfos[chain].namespace
     await open({ namespace })
   }
 
@@ -94,7 +94,7 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
       let connectedChain: TSupportedChain | undefined
 
       for (const chain of ChainHelper.supportedChains) {
-        const networks = ChainHelper.networksByChain[chain]
+        const networks = ChainHelper.chainInfos[chain].networks
 
         const network = networks.find(
           networkItem =>

@@ -17,7 +17,8 @@
     "test": "vitest run",
     "lint": "eslint",
     "format": "prettier",
-    "check": "prettier --write . && eslint --fix"
+    "check": "prettier --write . && eslint --fix",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@cityofzion/appkit-neo3-adapter": "file:../../packages/appkit-neo3-adapter",

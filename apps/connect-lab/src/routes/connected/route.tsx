@@ -48,12 +48,9 @@ function RouteComponent() {
   }
 
   const MethodComponent = methodsComponentByChain[connectionInfo.chain]
-  const ChainIcon = ChainHelper.iconsByChain[connectionInfo.chain]
-  const chainColor = ChainHelper.colorsByChain[connectionInfo.chain]
+  const chainInfo = ChainHelper.chainInfos[connectionInfo.chain]
 
-  const addressExplorerUrl = ChainHelper.addressExplorerUrlsByChain[connectionInfo.chain][connectionInfo.networkId] as
-    | string
-    | undefined
+  const addressExplorerUrl = chainInfo.addressUrlTemplate[connectionInfo.networkId] as string | undefined
   const replacedAddressExplorerUrl = addressExplorerUrl?.replace('{address}', connectionInfo.address)
 
   return (
@@ -66,11 +63,11 @@ function RouteComponent() {
         <header className="flex flex-col gap-4">
           <div className="flex w-full min-w-0 gap-2 max-md:grid max-md:grid-cols-6 max-md:grid-rows-3 md:h-13">
             <InfoBox className="items-center justify-center">
-              <ChainIcon className="size-4 min-h-4 min-w-4" style={{ color: chainColor }} />
+              <chainInfo.icon className="size-4 min-h-4 min-w-4" style={{ color: chainInfo.color }} />
             </InfoBox>
 
             <InfoBox label="Blockchain" className="max-md:col-span-2">
-              {connectionInfo.chain}
+              {chainInfo.name}
             </InfoBox>
 
             <InfoBox label="Network" className="max-md:col-span-3">

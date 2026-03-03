@@ -14,95 +14,109 @@ import PolygonIcon from '@/assets/icons/polygon.svg?react'
 import SolanaIcon from '@/assets/icons/solana.svg?react'
 import StellarIcon from '@/assets/icons/stellar.svg?react'
 
-export type TSupportedChain = (typeof ChainHelper.supportedChains)[number]
+export type TSupportedChain = 'neo3' | 'ethereum' | 'arbitrum' | 'base' | 'polygon' | 'neox' | 'solana' | 'stellar'
 
 export class ChainHelper {
-  static readonly supportedChains = [
-    'neo3',
-    'ethereum',
-    'arbitrum',
-    'base',
-    'neox',
-    'polygon',
-    'solana',
-    'stellar',
-  ] as const
-
-  static readonly iconsByChain: Record<TSupportedChain, ComponentType<SVGProps<SVGSVGElement>>> = {
-    neo3: Neo3Icon,
-    ethereum: EthereumIcon,
-    arbitrum: ArbitrumIcon,
-    base: BaseIcon,
-    neox: NeoxIcon,
-    polygon: PolygonIcon,
-    solana: SolanaIcon,
-    stellar: StellarIcon,
-  }
-
-  static readonly colorsByChain: Record<TSupportedChain, string> = {
-    neo3: '#16a34a',
-    ethereum: '#627eea',
-    arbitrum: '#28a0f0',
-    base: '#1d4ed8',
-    neox: '#10b981',
-    polygon: '#9333ea',
-    solana: '#6366f1',
-    stellar: '#fcd34d',
-  }
-
-  static readonly addressExplorerUrlsByChain: Record<TSupportedChain, Record<string, string>> = {
+  static readonly chainInfos: Record<
+    TSupportedChain,
+    {
+      name: string
+      addressUrlTemplate: Record<string, string>
+      color: string
+      icon: ComponentType<SVGProps<SVGSVGElement>>
+      namespace: ChainNamespace
+      networks: Array<AppKitNetwork>
+    }
+  > = {
     neo3: {
-      mainnet: 'https://dora.coz.io/address/neo3/mainnet/{address}',
-      testnet: 'https://dora.coz.io/address/neo3/testnet/{address}',
-    },
-    ethereum: {
-      1: 'https://eth.blockscout.com/address/{address}',
-      11_155_111: 'https://eth-sepolia.blockscout.com/address/{address}',
-    },
-    arbitrum: {
-      42_161: 'https://arbitrum.blockscout.com/address/{address}',
-    },
-    base: {
-      8_453: 'https://base.blockscout.com/address/{address}',
-    },
-    polygon: {
-      137: 'https://polygon.blockscout.com/address/{address}',
+      name: 'Neo N3',
+      color: '#16a34a',
+      icon: Neo3Icon,
+      // @ts-expect-error ChainNamespace does not include neo3
+      namespace: 'neo3',
+      networks: [neo3MainnetNetwork, neo3TestnetNetwork],
+      addressUrlTemplate: {
+        mainnet: 'https://dora.coz.io/address/neo3/mainnet/{address}',
+        testnet: 'https://dora.coz.io/address/neo3/testnet/{address}',
+      },
     },
     neox: {
-      47_763: 'https://xexplorer.neo.org/address/{address}',
-      12_227_332: 'https://xt4scan.ngd.network/address/{address}',
+      name: 'Neo X',
+      color: '#10b981',
+      icon: NeoxIcon,
+      namespace: 'eip155',
+      networks: [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork],
+      addressUrlTemplate: {
+        47_763: 'https://xexplorer.neo.org/address/{address}',
+        12_227_332: 'https://xt4scan.ngd.network/address/{address}',
+      },
     },
+    ethereum: {
+      name: 'Ethereum',
+      color: '#627eea',
+      icon: EthereumIcon,
+      namespace: 'eip155',
+      networks: [mainnet, sepolia],
+      addressUrlTemplate: {
+        1: 'https://eth.blockscout.com/address/{address}',
+        11_155_111: 'https://eth-sepolia.blockscout.com/address/{address}',
+      },
+    },
+    arbitrum: {
+      name: 'Arbitrum',
+      color: '#28a0f0',
+      icon: ArbitrumIcon,
+      namespace: 'eip155',
+      networks: [arbitrum],
+      addressUrlTemplate: {
+        42_161: 'https://arbitrum.blockscout.com/address/{address}',
+      },
+    },
+    base: {
+      name: 'Base',
+      color: '#1d4ed8',
+      icon: BaseIcon,
+      namespace: 'eip155',
+      networks: [base],
+      addressUrlTemplate: {
+        8_453: 'https://base.blockscout.com/address/{address}',
+      },
+    },
+    polygon: {
+      name: 'Polygon',
+      color: '#9333ea',
+      icon: PolygonIcon,
+      namespace: 'eip155',
+      networks: [polygon],
+      addressUrlTemplate: {
+        137: 'https://polygon.blockscout.com/address/{address}',
+      },
+    },
+
     solana: {
-      '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp': 'https://solscan.io/account/{address}',
-      EtWTRABZaYq6iMfeYKouRu166VU2xqa1: 'https://solscan.io/account/{address}?cluster=devnet',
+      name: 'Solana',
+      color: '#6366f1',
+      icon: SolanaIcon,
+      namespace: 'solana',
+      networks: [solana, solanaDevnet],
+      addressUrlTemplate: {
+        '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp': 'https://solscan.io/account/{address}',
+        EtWTRABZaYq6iMfeYKouRu166VU2xqa1: 'https://solscan.io/account/{address}?cluster=devnet',
+      },
     },
     stellar: {
-      mainnet: 'https://stellarchain.io/accounts/{address}',
-      testnet: 'https://testnet.stellarchain.io/accounts/{address}',
+      name: 'Stellar',
+      color: '#fcd34d',
+      icon: StellarIcon,
+      // @ts-expect-error ChainNamespace does not include stellar
+      namespace: 'stellar',
+      networks: [stellarMainnetNetwork, stellarTestnetNetwork],
+      addressUrlTemplate: {
+        mainnet: 'https://stellarchain.io/accounts/{address}',
+        testnet: 'https://testnet.stellarchain.io/accounts/{address}',
+      },
     },
   }
 
-  static readonly namespaceByChain: Record<TSupportedChain, ChainNamespace> = {
-    // @ts-expect-error ChainNamespace does not include neo3
-    neo3: 'neo3',
-    ethereum: 'eip155',
-    arbitrum: 'eip155',
-    base: 'eip155',
-    neox: 'eip155',
-    polygon: 'eip155',
-    solana: 'solana',
-    // @ts-expect-error ChainNamespace does not include stellar
-    stellar: 'stellar',
-  }
-
-  static readonly networksByChain: Record<TSupportedChain, Array<AppKitNetwork>> = {
-    ethereum: [mainnet, sepolia],
-    arbitrum: [arbitrum],
-    base: [base],
-    polygon: [polygon],
-    neo3: [neo3MainnetNetwork, neo3TestnetNetwork],
-    neox: [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork],
-    solana: [solana, solanaDevnet],
-    stellar: [stellarMainnetNetwork, stellarTestnetNetwork],
-  }
+  static readonly supportedChains = Object.keys(ChainHelper.chainInfos) as Array<TSupportedChain>
 }

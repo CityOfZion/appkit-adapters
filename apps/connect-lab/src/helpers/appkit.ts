@@ -22,11 +22,11 @@ export class AppKitHelper {
   static eip155Adapter = new WagmiAdapter({
     projectId: this.projectId,
     networks: [
-      ...ChainHelper.networksByChain.ethereum,
-      ...ChainHelper.networksByChain.arbitrum,
-      ...ChainHelper.networksByChain.base,
-      ...ChainHelper.networksByChain.polygon,
-      ...ChainHelper.networksByChain.neox,
+      ...ChainHelper.chainInfos.ethereum.networks,
+      ...ChainHelper.chainInfos.arbitrum.networks,
+      ...ChainHelper.chainInfos.base.networks,
+      ...ChainHelper.chainInfos.polygon.networks,
+      ...ChainHelper.chainInfos.neox.networks,
     ],
   })
 
@@ -39,7 +39,10 @@ export class AppKitHelper {
         icons: ['https://cityofzion.github.io/appkit-adapters/logo512.png'],
         url: 'https://cityofzion.github.io/appkit-adapters/',
       },
-      networks: Object.values(ChainHelper.networksByChain).flat() as [AppKitNetwork, ...Array<AppKitNetwork>],
+      networks: Object.values(ChainHelper.chainInfos).flatMap(chain => chain.networks) as [
+        AppKitNetwork,
+        ...Array<AppKitNetwork>,
+      ],
       adapters: [this.solanaAdapter, this.neo3Adapter, this.stellarAdapter, this.eip155Adapter],
       universalProviderConfigOverride: this.mergeUniversalProviderConfigOverride(
         Neo3Constants.OVERRIDES,

@@ -59,8 +59,7 @@ function App() {
       ) : (
         <ul className="animate-in fade-in slide-in-from-bottom-20 mx-auto mt-12 flex max-w-2xl flex-wrap justify-center gap-3 duration-500">
           {ChainHelper.supportedChains.map(chain => {
-            const Icon = ChainHelper.iconsByChain[chain]
-            const color = ChainHelper.colorsByChain[chain]
+            const info = ChainHelper.chainInfos[chain]
 
             return (
               <li key={chain}>
@@ -70,13 +69,13 @@ function App() {
                 >
                   <div
                     className="absolute top-0 left-0 h-full w-full opacity-0 transition-all duration-300 group-hover:opacity-100"
-                    style={{ backgroundColor: color }}
+                    style={{ backgroundColor: info.color }}
                   />
 
-                  <Icon className="relative size-6" />
+                  <info.icon className="relative size-6" />
 
                   <span className="font-brand relative text-sm font-bold tracking-widest text-white uppercase">
-                    {chain}
+                    {info.name}
                   </span>
                 </button>
               </li>
