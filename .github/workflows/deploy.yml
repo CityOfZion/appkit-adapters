@@ -47,6 +47,8 @@ jobs:
       - name: Build Connect Lab for GitHub Pages
         working-directory: apps/connect-lab
         run: pnpm run build
+        env:
+          VITE_PROJECT_ID: ${{ secrets.VITE_PROJECT_ID }}
 
       - name: Copy 404.html for GitHub Pages SPA routing
         run: cp apps/connect-lab/dist/index.html apps/connect-lab/dist/404.html
