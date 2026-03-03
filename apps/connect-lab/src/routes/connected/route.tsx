@@ -56,7 +56,7 @@ function RouteComponent() {
     <div className="flex flex-col gap-12">
       <RequestModal />
 
-      <header className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <div className="flex w-full min-w-0 gap-2 max-md:grid max-md:grid-cols-6 max-md:grid-rows-3 md:h-13">
           <InfoBox className="items-center justify-center">
             <chainInfo.icon className="size-4 min-h-4 min-w-4" style={{ color: chainInfo.color }} />
@@ -133,9 +133,9 @@ function RouteComponent() {
             )}
           </div>
         )}
-      </header>
+      </div>
 
-      <main className="flex flex-col gap-12">
+      <div className="flex flex-col gap-12">
         <Tabs.Root defaultValue="methods">
           <div className="flex items-center justify-between gap-4 border-b border-white/5 pb-2">
             <h2 className="font-sans text-base font-bold text-slate-400">Test Methods</h2>
@@ -162,7 +162,7 @@ function RouteComponent() {
             <CustomRequest />
           </Tabs.Content>
         </Tabs.Root>
-      </main>
+      </div>
     </div>
   )
 }

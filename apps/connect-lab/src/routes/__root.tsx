@@ -6,10 +6,11 @@ import { ThemeProvider } from '@/contexts/theme'
 import { RequestProvider } from '@/contexts/request'
 import { ConnectionProvider } from '@/contexts/connection'
 import { AppKitHelper } from '@/helpers/appkit'
-
-import './styles.css'
 import { InteractiveBackground } from '@/components/interactive-background'
 import { Button } from '@/components/ui/button'
+import COZ from '@/assets/icons/coz.svg?react'
+
+import './styles.css'
 
 AppKitHelper.setup()
 
@@ -18,10 +19,10 @@ export const Route = createRootRoute({
     <ThemeProvider defaultTheme="dark">
       <ConnectionProvider>
         <RequestProvider>
-          <div className="relative flex min-h-screen w-screen flex-col items-center px-10">
-            <InteractiveBackground />
+          <InteractiveBackground />
 
-            <div className="flex w-full justify-end pt-4 pb-8">
+          <div className="relative flex w-full max-w-7xl grow flex-col items-center gap-8 px-10 py-4">
+            <header className="flex w-full justify-end gap-2">
               <Button variant="secondary" asChild>
                 <Link
                   to={'https://github.com/CityOfZion/appkit-adapters' as string}
@@ -32,11 +33,18 @@ export const Route = createRootRoute({
                   Github
                 </Link>
               </Button>
-            </div>
 
-            <div className="flex w-full max-w-7xl flex-col items-center">
+              <Button variant="secondary" asChild>
+                <Link to={'https://coz.io/' as string} target="_blank" rel="noopener noreferrer">
+                  <COZ className="size-5" />
+                  COZ
+                </Link>
+              </Button>
+            </header>
+
+            <main className="flex h-full w-full flex-col items-center">
               <Outlet />
-            </div>
+            </main>
           </div>
         </RequestProvider>
       </ConnectionProvider>

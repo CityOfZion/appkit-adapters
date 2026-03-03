@@ -78,7 +78,7 @@
 }
 
 body {
-  @apply m-0;
+  @apply m-0 h-screen w-screen overflow-auto;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -214,7 +214,7 @@ code {
   }
 
   #app {
-    @apply flex h-screen w-screen flex-col font-sans;
+    @apply flex min-h-screen flex-col font-sans overflow-y-auto overflow-x-hidden h-screen w-screen items-center;
   }
 }
 
