@@ -32,8 +32,8 @@ function App() {
         Connect<span className="text-primary font-black">Lab</span>
       </h1>
 
-      <h2 className="animate-in fade-in slide-in-from-bottom-20 mt-4 flex max-w-md items-center gap-2 text-center text-xl font-bold duration-500 max-sm:text-base">
-        A testing environment for your WalletConnect V2 integrations.
+      <h2 className="animate-in fade-in slide-in-from-bottom-20 mt-4 max-w-md items-center gap-2 text-center text-2xl font-medium text-slate-400 duration-500 max-sm:text-base">
+        The Premier Visual Sandbox for <span className="font-black text-white">WalletConnect</span> Testing & Debugging.
       </h2>
 
       {connectionInfo.status !== 'not_connected' ? (
