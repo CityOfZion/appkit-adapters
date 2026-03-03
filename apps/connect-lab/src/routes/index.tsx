@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
-import { InteractiveBackground } from '@/components/interactive-background'
+import { Fragment, useEffect } from 'react'
 import { ChainHelper } from '@/helpers/chain'
 import { useConnection } from '@/hooks/use-connection'
 import { AnimatedAppLogo } from '@/components/app-logo'
@@ -23,9 +22,7 @@ function App() {
   }, [connectionInfo.status])
 
   return (
-    <div className="w-scree relative flex h-screen flex-col items-center px-10">
-      <InteractiveBackground />
-
+    <Fragment>
       <AnimatedAppLogo className="mt-36" />
 
       <h1 className="font-grotesk animate-in fade-in slide-in-from-bottom-20 mt-6 text-7xl font-bold -tracking-widest duration-500 max-sm:text-4xl">
@@ -83,6 +80,6 @@ function App() {
           })}
         </ul>
       )}
-    </div>
+    </Fragment>
   )
 }
