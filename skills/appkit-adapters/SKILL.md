@@ -135,7 +135,11 @@ export const appKitConfig = {
 
 ## When to use
 
-When an agent needs to add Neo N3, NeoX, or Stellar wallet connectivity to an app using Reown AppKit.
+When an agent needs to add Neo X, Neo N3, and/or Stellar wallet connectivity to an app using Reown AppKit.
+
+**Important nuance (proved in this workspace):**
+- **Neo X** support is currently **networks-only** (plus any separate wagmi actions you use). There is **no** NeoX AppKit adapter factory for `adapters: [...]` in `@cityofzion/appkit-neox-adapter@1.0.0`.
+- **Neo N3** and **Stellar** do have AppKit adapters (`@cityofzion/appkit-neo3-adapter`, `@cityofzion/appkit-stellar-adapter`) that are included in `adapters: [...]`.
 
 This skill generates **framework-specific integration steps** (config, example code, and checklists) for Reown AppKit wallet connectivity on Neo N3, NeoX, and Stellar.
 
@@ -209,6 +213,18 @@ npm fallback:
 ```bash
 npm ci && npm run build
 ```
+
+### Troubleshooting: Node-only / CI environments
+
+If you run `createAppKit(...)` in a **Node-only** script (no browser), you may see warnings like:
+
+- `[Reown Config] Failed to fetch remote project configuration... HTTP status code: 403`
+
+This happens when `projectId` is missing/invalid (or outbound access is blocked) and AppKit tries to fetch remote feature/config flags.
+
+- This does **not** necessarily indicate a wiring/type issue.
+- For real UI integration, validate in a browser-based app (React/Vite/Next) with a real `projectId`.
+- In CI, treat these as **runtime warnings** unless they break your build.
 
 ### `.env` guidance
 
@@ -433,3 +449,74 @@ Scope: only what we can reasonably validate via **static inspection of generated
 - The *exact exported TypeScript type name* for the AppKit “createAppKit options/config object” **in other versions**.
   - In this workspace (`@reown/appkit@1.8.19`), typings prove the name is `CreateAppKit`.
   - If a future build shows a different exported type name, update the snippets + this note together, and capture new logs.
+
+
+## Addendum: Multi-chain wiring (NeoX + Neo N3 + Stellar) — proved in `projects/appkit-ts`
+
+This workspace contains a minimal Vite/React app at:
+- `/root/.picoclaw/workspace/projects/appkit-ts`
+
+It builds successfully with:
+- `@reown/appkit@1.8.19`
+- `@reown/appkit-adapter-wagmi@1.8.19`
+- `@cityofzion/appkit-neox-adapter@1.0.0` (networks-only)
+- `@cityofzion/appkit-neo3-adapter@1.0.0` (adapter)
+- `@cityofzion/appkit-stellar-adapter@1.0.0` (adapter)
+
+### Minimal wiring example (React + Vite)
+
+```ts
+import { createAppKit } from '@reown/appkit'
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { mainnet } from 'viem/chains'
+
+import {
+  neoXMainnetNetwork,
+  neoXTestnetNetwork
+} from '@cityofzion/appkit-neox-adapter'
+
+import {
+  Neo3Adapter,
+  neo3MainnetNetwork,
+  neo3TestnetNetwork
+} from '@cityofzion/appkit-neo3-adapter'
+
+import {
+  StellarAdapter,
+  stellarMainnetNetwork,
+  stellarTestnetNetwork
+} from '@cityofzion/appkit-stellar-adapter'
+
+const projectId = import.meta.env.VITE_WC_PROJECT_ID || 'demo'
+
+const networks = [
+  mainnet,
+  neoXMainnetNetwork,
+  neoXTestnetNetwork,
+  neo3MainnetNetwork,
+  neo3TestnetNetwork,
+  stellarMainnetNetwork,
+  stellarTestnetNetwork
+] as const
+
+const wagmiAdapter = new WagmiAdapter({ projectId, networks: [...networks] })
+const neo3Adapter = new Neo3Adapter()
+const stellarAdapter = new StellarAdapter()
+
+createAppKit({
+  adapters: [wagmiAdapter, neo3Adapter, stellarAdapter],
+  networks: [...networks],
+  projectId,
+  metadata: {
+    name: 'appkit-ts-web',
+    description: 'AppKit minimal web app',
+    url: window.location.origin,
+    icons: ['https://avatars.githubusercontent.com/u/37784886']
+  }
+})
+```
+
+### Notes / gotchas
+
+- NeoX: do **not** attempt to import a NeoX adapter factory; it does not exist in 1.0.0.
+- If you see pnpm peer warnings about `utf-8-validate` or `@cityofzion/neon-core`, they are warnings in this harness and did not block `pnpm build`.
