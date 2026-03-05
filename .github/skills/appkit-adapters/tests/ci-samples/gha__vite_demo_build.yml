@@ -1,0 +1,48 @@
+name: appkit-adapters-demo-build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-vite-demo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      # NOTE: update this path to wherever you keep the runnable Vite demo.
+      # NOTE: This is a reference workflow; adapt Node version, pnpm version, and paths to your environment.
+      - name: Install deps (demo)
+        working-directory: AKB/SKILLS/appkit-adapters/examples/vite-react-neo3
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (demo)
+        working-directory: AKB/SKILLS/appkit-adapters/examples/vite-react-neo3
+        run: pnpm build

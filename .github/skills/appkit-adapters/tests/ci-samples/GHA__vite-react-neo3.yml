@@ -1,0 +1,72 @@
+# GHA__vite-react-neo3.yml
+# Sample (non-binding) GitHub Actions workflow for validating the canonical example.
+# Intended as a reference scaffold that can be copied into .github/workflows/ in the AKB repo.
+
+name: skill-examples__vite-react-neo3
+
+on:
+  push:
+    paths:
+      - 'AKB/SKILLS/appkit-adapters/**'
+  pull_request:
+    paths:
+      - 'AKB/SKILLS/appkit-adapters/**'
+
+jobs:
+  install-and-build-vite-react-neo3:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [20.x]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # NOTE: This is a reference workflow; adapt Node version, pnpm version, and paths to your environment.
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          # Native pnpm cache support in setup-node (recommended)
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      # Optional: explicit cache (use if you prefer actions/cache instead of setup-node caching)
+      # - name: Cache pnpm store
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       ~/.pnpm-store
+      #       ~/.local/share/pnpm/store
+      #     key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pnpm-store-
+
+      - name: Install + build (vite-react-neo3)
+        working-directory: AKB/SKILLS/appkit-adapters/examples/vite-react-neo3
+        run: |
+          pnpm -v
+          node -v
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      # Optional: add lint/typecheck if the example defines those scripts.
+      # - name: Lint
+      #   working-directory: AKB/SKILLS/appkit-adapters/examples/vite-react-neo3
+      #   run: pnpm lint
+      #
+      # - name: Typecheck
+      #   working-directory: AKB/SKILLS/appkit-adapters/examples/vite-react-neo3
+      #   run: pnpm typecheck
