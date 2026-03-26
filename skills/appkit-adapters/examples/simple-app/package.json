@@ -1,0 +1,31 @@
+{
+  "name": "appkit-simple-integration",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 4173",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173"
+  },
+  "dependencies": {
+    "@cityofzion/appkit-neo3-adapter": "1.0.0",
+    "@cityofzion/appkit-stellar-adapter": "1.0.0",
+    "@reown/appkit": "1.8.19",
+    "@reown/appkit-common": "1.8.19",
+    "@reown/appkit-controllers": "1.8.19",
+    "@walletconnect/universal-provider": "2.23.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "viem": "^2.37.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  }
+}

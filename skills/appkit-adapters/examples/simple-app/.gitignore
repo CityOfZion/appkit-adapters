@@ -1,0 +1,14 @@
+# Do not vendor dependencies or build artifacts in AKB examples
+node_modules/
+dist/
+.vite/
+
+# Env
+.env
+.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
