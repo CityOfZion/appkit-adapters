@@ -3,7 +3,6 @@ import { Fragment, useEffect } from 'react'
 import { ChainHelper } from '@/helpers/chain'
 import { useConnection } from '@/hooks/use-connection'
 import { AnimatedAppLogo } from '@/components/app-logo'
-import { UtilsHelper } from '@/helpers/utils'
 import { Spinner } from '@/components/ui/spinner'
 
 export const Route = createFileRoute('/')({
@@ -16,14 +15,17 @@ function App() {
 
   useEffect(() => {
     if (connectionInfo.status !== 'connected') return
-    UtilsHelper.sleep(1500).then(() => {
+
+    const timeoutId = setTimeout(() => {
       navigate({ to: '/connected' })
-    })
+    }, 1500)
+
+    return () => clearTimeout(timeoutId)
   }, [connectionInfo.status])
 
   return (
     <Fragment>
-      <AnimatedAppLogo className="mt-36" />
+      <AnimatedAppLogo className="mt-24" />
 
       <h1 className="font-grotesk animate-in fade-in slide-in-from-bottom-20 mt-6 text-7xl font-bold -tracking-widest duration-500 max-sm:text-4xl">
         Connect<span className="text-primary font-black">Lab</span>
@@ -54,7 +56,7 @@ function App() {
           )}
         </div>
       ) : (
-        <ul className="animate-in fade-in slide-in-from-bottom-20 mx-auto mt-12 flex max-w-2xl flex-wrap justify-center gap-3 duration-500">
+        <ul className="animate-in fade-in slide-in-from-bottom-20 mx-auto mt-12 flex max-w-3xl flex-wrap justify-center gap-3 duration-500">
           {ChainHelper.supportedChains.map(chain => {
             const info = ChainHelper.chainInfos[chain]
 

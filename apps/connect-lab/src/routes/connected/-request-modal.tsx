@@ -15,7 +15,7 @@ export function RequestModal() {
         <Dialog.Content
           onInteractOutside={event => event.preventDefault()}
           className={StyleHelper.merge({
-            'max-h-[90dvh] min-h-130 w-sm min-w-160 resize duration-0 sm:max-w-[90dvw]':
+            'max-h-[90dvh] min-h-130 w-sm min-w-160 resize duration-0 max-sm:min-w-80 sm:max-w-[90dvw]':
               requestState.status === 'success' || requestState.status === 'error',
           })}
         >

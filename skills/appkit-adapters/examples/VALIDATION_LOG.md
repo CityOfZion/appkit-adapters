@@ -1,7 +1,7 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-04
+last_updated: 2026-10-19
 version: 0.1
 ---
 
@@ -19,7 +19,7 @@ For each cycle, log:
 - Canonical validation runs use **pnpm**.
 - Any `npm` attempts should be annotated as **non-canonical / for reference only**.
 
-Note: `examples/vite-react-neo3/node_modules/` may appear from local runs. It is not part of the AKB contract and should normally be ignored in reviews/PR diffs.
+Note: `examples/*/node_modules/` and `examples/*/dist/` may appear from local runs. They are git-ignored and should normally be ignored in reviews/PR diffs.
 
 Environment:
 - runtime/tooling: this execution environment enforces a ~60s cap on some commands (notably `npm install`), which can cause false-negative install failures.
@@ -46,7 +46,30 @@ Environment:
   - for CI/agent runs with strict caps: enable dependency caching (pnpm store / npm cache) or use prebuilt images
   - if available, increase job timeout / allow longer install steps
 
+## Cycle 2 — 2026-10-19 — local package links (vite-react-neo3, simple-app)
+
+Status: install + build validated; wallet flows not exercised.
+
+### Changes under test
+- Both examples switched from npm versions to local links: `file:../../../../packages/<name>`.
+- `vite-react-neo3`: `build` is now `tsc -b && vite build`.
+- `simple-app`: gained Bitcoin (`@cityofzion/appkit-bitcoin-adapter`, `bip122`) and NeoX (`@cityofzion/appkit-neox-adapter` + `WagmiAdapter`), alongside Neo3 and Stellar; overrides merged into one object.
+- Both ship a `.env.example` with `VITE_REOWN_PROJECT_ID`.
+
+### Commands to run
+- Repo root: `rush install && rush build-packages`
+- `examples/vite-react-neo3`: `pnpm install --frozen-lockfile && pnpm build`
+- `examples/simple-app`: `pnpm install --frozen-lockfile && pnpm build`
+- Optional: `pnpm dev` in each, confirm the modal opens (simple-app: Neo3, Stellar, Bitcoin and NeoX testnets)
+
+### Environment
+- macOS / node v24.14.0 / pnpm 9.15.9 (via `packageManager`)
+
+Result: PASS — `tests/ci-samples/local-smoke.sh` installed and built both examples (`tsc -b && vite build`), and `pnpm lint` passed in `vite-react-neo3`. `pnpm dev` and wallet connections were not exercised.
+
 ## Known correctness constraints (from upstream docs)
 - Neo3: must set `universalProviderConfigOverride: Neo3Constants.OVERRIDES`
 - Stellar: must set `universalProviderConfigOverride: StellarConstants.OVERRIDES`
-- NeoX: EVM (`eip155`); use WagmiAdapter; use `sendTransaction` helper for anti-MEV networks
+- Bitcoin: set `universalProviderConfigOverride: BitcoinConstants.OVERRIDES`; never register `@reown/appkit-adapter-bitcoin` alongside `BitcoinAdapter`
+- Multiple chains: merge all overrides into one object
+- NeoX: EVM (`eip155`); use `new WagmiAdapter({ projectId, networks })`; use the package `sendTransaction` / `signTransaction` (with `wagmiAdapter.wagmiConfig`) for anti-MEV networks

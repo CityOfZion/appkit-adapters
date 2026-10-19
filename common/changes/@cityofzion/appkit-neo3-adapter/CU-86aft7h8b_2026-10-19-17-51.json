@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cityofzion/appkit-neo3-adapter",
+      "comment": "Fix errors",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cityofzion/appkit-neo3-adapter"
+}

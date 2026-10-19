@@ -10,14 +10,14 @@ You can access the deployed project here: [Connect Lab on GitHub Pages](https://
 
 **NeoX is a fully EVM-compatible blockchain**, which means it uses the standard Ethereum namespace (`eip155`) and works seamlessly with existing Ethereum adapters. This package provides pre-configured NeoX network definitions and utilities that you can use with the standard `WagmiAdapter` from Reown AppKit.
 
-> **💡 Need a working example?** Check out the [Connect Lab](../../apps/connect-lab/) project for a complete implementation demonstrating how to use NeoX in a real-world application.
+> **💡 Need a working example?** Check out the [Connect Lab](../../apps/connect-lab) project for a complete implementation demonstrating how to use NeoX in a real-world application.
 
 > **📚 Learn more about AppKit:** Visit the official [Reown AppKit repository](https://github.com/reown-com/appkit) for comprehensive documentation, examples, and the latest updates on AppKit features.
 
 ## Installation
 
 ```bash
-npm install @cityofzion/appkit-neox-adapter @reown/appkit-adapter-wagmi @wagmi/core viem
+npm install @cityofzion/appkit-neox-adapter @reown/appkit @reown/appkit-common @reown/appkit-adapter-wagmi @wagmi/core viem wagmi @tanstack/react-query
 ```
 
 ## Anti-MEV Transaction Support
@@ -35,14 +35,16 @@ import { createAppKit } from '@reown/appkit';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { neoXMainnetNetwork, neoXTestnetNetwork, neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork } from '@cityofzion/appkit-neox-adapter';
 
+const projectId = 'YOUR_PROJECT_ID'; // Get from https://cloud.reown.com
+const networks = [neoXMainnetNetwork, neoXTestnetNetwork]; // Or [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork]
 
-const wagmiAdapter = new WagmiAdapter()
+const wagmiAdapter = new WagmiAdapter({ projectId, networks });
 
 // Create AppKit instance with NeoX support
 createAppKit({
-  projectId: 'YOUR_PROJECT_ID', // Get from https://cloud.reown.com
+  projectId,
   adapters: [wagmiAdapter],
-  networks: [neoXMainnetNetwork, neoXTestnetNetwork], // Or [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork]
+  networks,
   metadata: {
     name: 'My NeoX dApp',
     description: 'My NeoX dApp description',
@@ -58,17 +60,19 @@ createAppKit({
 import React from 'react';
 import { AppKitProvider } from "@reown/appkit/react";
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import { neoXMainnetNetwork, neoXTestnetNetwork, neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork  } from '@cityofzion/appkit-neox-adapter';
+import { neoXMainnetNetwork, neoXTestnetNetwork, neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork } from '@cityofzion/appkit-neox-adapter';
 
-const wagmiAdapter = new WagmiAdapter()
+const projectId = 'YOUR_PROJECT_ID';
+const networks = [neoXMainnetNetwork, neoXTestnetNetwork]; // Or [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork]
 
+const wagmiAdapter = new WagmiAdapter({ projectId, networks });
 
 function App() {
   return (
     <AppKitProvider
       adapters={[wagmiAdapter]}
-      networks={[neoXMainnetNetwork, neoXTestnetNetwork]} // Or [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork]
-      projectId='YOUR_PROJECT_ID'
+      networks={networks}
+      projectId={projectId}
       metadata={{
         name: 'My NeoX dApp',
         description: 'My NeoX dApp description',

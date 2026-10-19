@@ -1,8 +1,10 @@
 ---
+name: appkit-adapters
+description: Teaches how to integrate CityOfZion AppKit adapters (Neo3, Neo X, Stellar, Bitcoin) into Reown AppKit apps; use when adding wallet connectivity for those chains to a frontend.
 status: draft
 owner: Trinity
-last_updated: 2026-03-25
-version: 0.2
+last_updated: 2026-10-19
+version: 0.3
 ---
 
 # SKILL: Integrate CityOfZion AppKit Adapters
@@ -13,9 +15,13 @@ This skill must align with the runnable examples under `examples/`.
 
 Validated examples in this repository:
 - `examples/vite-react-neo3/` — canonical single-chain Neo3 example
-- `examples/simple-app/` — canonical multi-chain example (Neo3 + Stellar + NeoX)
+- `examples/simple-app/` — canonical multi-chain example (Neo3 + Stellar + Bitcoin + Neo X), testnet networks only, served on port 4173
+
+Both examples depend on the adapters through local `file:../../../../packages/<name>` links, so the packages must be built from the repository root first (`rush install && rush build-packages`).
 
 If this document conflicts with those examples, treat the examples as the implementation truth and update this skill.
+
+Full doc map: [INDEX.md](./INDEX.md).
 
 ## What is actually validated here
 
@@ -41,6 +47,8 @@ import {
   neo3MainnetNetwork,
   neo3TestnetNetwork,
 } from '@cityofzion/appkit-neo3-adapter'
+
+const projectId = import.meta.env.VITE_REOWN_PROJECT_ID
 
 createAppKit({
   projectId,
@@ -70,11 +78,12 @@ createAppKit({
 ### Multi-chain example contract — `examples/simple-app`
 
 Validated implementation pattern:
-- Neo3 uses `Neo3Adapter` + Neo3 networks + `Neo3Constants.OVERRIDES`
-- Stellar uses `StellarAdapter` + Stellar networks + `StellarConstants.OVERRIDES`
-- NeoX uses `WagmiAdapter` + NeoX network definitions from `@cityofzion/appkit-neox-adapter`
-- Reown peer/runtime packages required by the examples are installed explicitly
-- Universal provider overrides are merged when multiple non-EVM adapters are present
+- Neo3 uses `Neo3Adapter` + `neo3TestnetNetwork` + `Neo3Constants.OVERRIDES`
+- Stellar uses `StellarAdapter` + `stellarTestnetNetwork` + `StellarConstants.OVERRIDES`
+- Bitcoin uses `BitcoinAdapter` + `bitcoinTestnetNetwork` + `BitcoinConstants.OVERRIDES`
+- Neo X uses `new WagmiAdapter({ projectId, networks: [neoXTestnetNetwork] })` with the network from `@cityofzion/appkit-neox-adapter`
+- AppKit accepts a single `universalProviderConfigOverride`, so the app merges the per-namespace overrides of every non-EVM adapter itself (see [REF__universal_provider_overrides.md](./reference/REF__universal_provider_overrides.md))
+- The Reown/WalletConnect peer packages are installed explicitly
 
 ## Dependency guidance
 
@@ -93,49 +102,48 @@ Validated implementation pattern:
 import { createAppKit, useAppKit, useAppKitAccount, useAppKitProvider } from '@reown/appkit/react'
 ```
 
+### Required peer dependencies
+
+The non-EVM adapters (`appkit-neo3-adapter`, `appkit-stellar-adapter`, `appkit-bitcoin-adapter`) declare these as **required peer dependencies**; the app must install them:
+- `@reown/appkit`
+- `@reown/appkit-common`
+- `@reown/appkit-controllers`
+- `@walletconnect/universal-provider`
+
+`@cityofzion/appkit-neox-adapter` peers: `@reown/appkit`, `@reown/appkit-common`, `viem`, `@wagmi/core` (plus `@reown/appkit-adapter-wagmi` to create the `WagmiAdapter`, its peer `wagmi`, and `wagmi`'s peer `@tanstack/react-query`).
+
+If a peer is missing, Vite/TypeScript resolution fails at build time.
+
 ### Dependencies required by the validated examples
 
-For the local Neo3 example in this repo, the working dependency set includes:
-- `@cityofzion/appkit-neo3-adapter`
-- `@reown/appkit@1.8.19`
-- `@reown/appkit-common@1.8.19`
-- `@reown/appkit-controllers@1.8.19`
-- `react`
-- `react-dom`
+Neo3 example (`examples/vite-react-neo3/package.json`):
+- `@cityofzion/appkit-neo3-adapter` (local `file:` link)
+- `@reown/appkit`, `@reown/appkit-common`, `@reown/appkit-controllers`, `@walletconnect/universal-provider`
+- `react`, `react-dom`
 
-Reason:
-- the local adapter source imports Reown peer packages that must be resolvable from the example app
-- if `@reown/appkit-common` and `@reown/appkit-controllers` are omitted, the example build can fail during Vite resolution
+Multi-chain example (`examples/simple-app/package.json`):
+- `@cityofzion/appkit-neo3-adapter`, `@cityofzion/appkit-stellar-adapter`, `@cityofzion/appkit-bitcoin-adapter`, `@cityofzion/appkit-neox-adapter` (local `file:` links)
+- `@reown/appkit`, `@reown/appkit-common`, `@reown/appkit-controllers`, `@walletconnect/universal-provider`
+- `@reown/appkit-adapter-wagmi`, `@wagmi/core`, `viem`, `wagmi`, `@tanstack/react-query`
+- `react`, `react-dom`
 
-For the multi-chain example, the working dependency set includes:
-- `@cityofzion/appkit-neo3-adapter@1.0.0`
-- `@cityofzion/appkit-neox-adapter@1.0.0`
-- `@cityofzion/appkit-stellar-adapter@1.0.0`
-- `@reown/appkit@1.8.19`
-- `@reown/appkit-adapter-wagmi@1.8.19`
-- `@reown/appkit-common@1.8.19`
-- `@reown/appkit-controllers@1.8.19`
-- `@walletconnect/universal-provider@2.23.4`
-- `@wagmi/core@2.22.1`
-- `viem`
-- `react`
-- `react-dom`
+Exact versions: see `examples/simple-app/package.json` and `examples/vite-react-neo3/package.json`; do not copy pinned versions from docs.
 
 ## Chain-specific reality
 
 ### Neo3
 
-Supported and validated in examples.
+Supported and validated in both examples.
 
 Required details:
 - `new Neo3Adapter()` in `adapters`
 - `Neo3Constants.OVERRIDES`
 - Neo3 networks in `networks`
-- `useAppKitProvider('neo3')` for wallet-backed provider access
+- `useAppKitProvider<Neo3Provider>('neo3')` for wallet-backed provider access (`invokeFunction`, `testInvoke`, `calculateFee`, `signTransaction`, `signMessage`, `verifyMessage`, `getWalletInfo`, `encrypt`, `decrypt`, `decryptFromArray`)
 
 Known typing nuance:
-- current AppKit typings may not include the `neo3` namespace cleanly
-- targeted `@ts-expect-error` usage is currently present in the validated example around `useAppKitProvider('neo3')` and `open({ namespace: 'neo3' })`
+- AppKit's `ChainNamespace` does not include `neo3`
+- targeted `@ts-expect-error` is required around `useAppKitProvider('neo3')` and `open({ namespace: 'neo3' })`
 
 ### Stellar
 
@@ -144,25 +152,46 @@ Supported and validated in the multi-chain example.
 Required details:
 - `new StellarAdapter()` in `adapters`
 - `StellarConstants.OVERRIDES`
-- Stellar networks in `networks`
-- `useAppKitProvider('stellar')` for wallet-backed provider access
+- Stellar networks in `networks` (`stellarMainnetNetwork` id `pubnet`, `stellarTestnetNetwork` id `testnet`)
+- `useAppKitProvider<StellarProvider>('stellar')` (`signTransaction`, `signAndSubmitTransaction`, `signMessage`, `signAuthEntry`, `getNetwork`)
+- Same `@ts-expect-error` nuance as Neo3 for the `stellar` namespace
 
-### NeoX
+### Bitcoin
 
-Supported as EVM-style wiring in the multi-chain example.
+Supported and validated in the multi-chain example. `@cityofzion/appkit-bitcoin-adapter` is not yet published to npm; use the local package build.
+
+Required details:
+- `new BitcoinAdapter()` in `adapters`
+- `BitcoinConstants.OVERRIDES` (AppKit already requests the Bitcoin methods; the override also registers the `bip122_addressesChanged` event, so include it in the merged override)
+- `bitcoinMainnetNetwork` / `bitcoinTestnetNetwork` in `networks`
+- `useAppKitProvider<BitcoinProvider>('bip122')` (`getAccountAddresses`, `signMessage`, `signPsbt`, `sendTransfer`); the provider fills the `account` param automatically
+
+Differences from Neo3/Stellar:
+- `bip122` is a native AppKit namespace, so **no** `@ts-expect-error` is needed
+- WalletConnect only: no browser extension wallets (Xverse, Leather, Unisat, OKX); targets wallets built on `@cityofzion/bs-bitcoin`, such as NEON Wallet
+- Use it **instead of** `@reown/appkit-adapter-bitcoin`, never both (both register `bip122`)
+
+See [reference/ADAPTER__bitcoin.md](./reference/ADAPTER__bitcoin.md).
+
+### Neo X
+
+Supported as EVM wiring in the multi-chain example.
 
 Current validated reality:
-- NeoX is wired through `WagmiAdapter`
-- NeoX networks come from `@cityofzion/appkit-neox-adapter`
-- There is no separate NeoX AppKit adapter used in `adapters`
+- Neo X is wired through `new WagmiAdapter({ projectId, networks })` from `@reown/appkit-adapter-wagmi`
+- `@cityofzion/appkit-neox-adapter` is **not** an AppKit adapter; it exports networks (`neoXMainnetNetwork`, `neoXTestnetNetwork`, `neoXAntiMevMainnetNetwork`, `neoXAntiMevTestnetNetwork`) and helpers (`sendTransaction`, `signTransaction`, `buildAntiMevTransaction`, `getCachedTransaction`, `isAntiMevNetwork`, `governanceAbi`, `keyManagementAbi`)
+- No universal provider override is needed (`eip155` is native)
+
+See [reference/ADAPTER__neox.md](./reference/ADAPTER__neox.md).
 
 ## When to use this skill
 
 Use this skill when an app needs:
 - Neo3 wallet connectivity via Reown AppKit
 - Stellar wallet connectivity via Reown AppKit
-- NeoX network support alongside wagmi/AppKit
-- a minimal runnable example or integration scaffold that matches this repository’s working examples
+- Bitcoin wallet connectivity via WalletConnect wallets such as NEON Wallet
+- Neo X network support (including anti-MEV transactions) alongside wagmi/AppKit
+- a minimal runnable example or integration scaffold that matches this repository's working examples
 
 ## What the agent should produce
 
@@ -183,10 +212,17 @@ A change is only done when:
 
 ## Verification commands
 
+Build the local adapter packages first (repository root):
+
+```bash
+rush install
+rush build-packages
+```
+
 Single-chain Neo3 example:
 
 ```bash
-cd examples/vite-react-neo3
+cd skills/appkit-adapters/examples/vite-react-neo3
 pnpm install
 pnpm build
 ```
@@ -194,7 +230,9 @@ pnpm build
 Multi-chain example:
 
 ```bash
-cd examples/simple-app
+cd skills/appkit-adapters/examples/simple-app
 pnpm install
 pnpm build
 ```
+
+Both examples read `VITE_REOWN_PROJECT_ID` (copy `.env.example` to `.env`).

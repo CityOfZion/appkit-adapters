@@ -1,8 +1,8 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-25
-version: 0.2
+last_updated: 2026-10-19
+version: 0.3
 ---
 
 # Packages & Import Paths
@@ -19,16 +19,27 @@ version: 0.2
 |---|---|---|---|
 | `@reown/appkit` | core package | `import { createAppKit } from '@reown/appkit/react'` | installed package; React APIs are imported from subpath |
 | `@reown/appkit/react` | subpath export | `import { useAppKit } from '@reown/appkit/react'` | import path only, not a package |
-| `@cityofzion/appkit-neo3-adapter` | adapter package | `import { Neo3Adapter } from '@cityofzion/appkit-neo3-adapter'` | validated in `examples/vite-react-neo3` |
-| `@cityofzion/appkit-neox-adapter` | network/helper package | `import { neoXTestnetNetwork } from '@cityofzion/appkit-neox-adapter'` | used with wagmi/AppKit, not as a separate adapter object |
+| `@cityofzion/appkit-neo3-adapter` | adapter package | `import { Neo3Adapter } from '@cityofzion/appkit-neo3-adapter'` | validated in both examples |
 | `@cityofzion/appkit-stellar-adapter` | adapter package | `import { StellarAdapter } from '@cityofzion/appkit-stellar-adapter'` | validated in `examples/simple-app` |
-| `@reown/appkit-common` | Reown peer/runtime package | normal package resolution | explicitly required in validated examples using local/source-linked adapters |
-| `@reown/appkit-controllers` | Reown peer/runtime package | normal package resolution | explicitly required in validated examples using local/source-linked adapters |
+| `@cityofzion/appkit-bitcoin-adapter` | adapter package | `import { BitcoinAdapter } from '@cityofzion/appkit-bitcoin-adapter'` | validated in `examples/simple-app`; not yet published to npm; replaces `@reown/appkit-adapter-bitcoin` (never use both) |
+| `@cityofzion/appkit-neox-adapter` | network/helper package | `import { neoXTestnetNetwork } from '@cityofzion/appkit-neox-adapter'` | used with `WagmiAdapter`, not an adapter object; root export only (no `/networks` subpath) |
+| `@reown/appkit-adapter-wagmi` | Reown EVM adapter | `import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'` | needed for Neo X |
+| `@reown/appkit-common` | required peer | normal package resolution | peer of every CityOfZion package |
+| `@reown/appkit-controllers` | required peer | normal package resolution | peer of Neo3, Stellar, Bitcoin adapters |
+| `@walletconnect/universal-provider` | required peer | normal package resolution | peer of Neo3, Stellar, Bitcoin adapters |
+| `viem`, `@wagmi/core` | required peers | normal package resolution | peers of `@cityofzion/appkit-neox-adapter` |
 
-## Important note for local adapter-source examples
+## Peer dependencies
 
-When an example points at local adapter source instead of a fully bundled published package, Vite/module resolution may fail unless the app explicitly installs Reown peer/runtime packages used by that adapter.
+The CityOfZion packages declare the Reown/WalletConnect packages as **peer dependencies**, so the app must install them; they are not a workaround for local-source setups.
 
-In this repository, the validated Neo3 example required:
-- `@reown/appkit-common@1.8.19`
-- `@reown/appkit-controllers@1.8.19`
+- Neo3, Stellar, Bitcoin adapters: `@reown/appkit`, `@reown/appkit-common`, `@reown/appkit-controllers`, `@walletconnect/universal-provider`
+- Neo X package: `@reown/appkit`, `@reown/appkit-common`, `viem`, `@wagmi/core`
+
+`@cityofzion/neon-dappkit-types` is a regular dependency of the Neo3 adapter; install it in the app only if you import from it directly.
+
+Exact versions used by the examples: `examples/simple-app/package.json` and `examples/vite-react-neo3/package.json`.
+
+## Local packages in this repository
+
+The examples link the adapters with `file:../../../../packages/<name>`, which resolves to the built `dist/` output. Run `rush install && rush build-packages` from the repository root before `pnpm install` in an example.

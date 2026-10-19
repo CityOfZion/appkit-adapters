@@ -1,12 +1,13 @@
 import { Neo3Adapter, Neo3Constants } from '@cityofzion/appkit-neo3-adapter'
 import { StellarAdapter, StellarConstants } from '@cityofzion/appkit-stellar-adapter'
+import { BitcoinAdapter, BitcoinConstants } from '@cityofzion/appkit-bitcoin-adapter'
 import { SolanaAdapter } from '@reown/appkit-adapter-solana/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { createAppKit } from '@reown/appkit/react'
 import { ChainHelper } from './chain'
 import type { AppKitNetwork } from '@reown/appkit/networks'
 
-export type TUniversalProviderConfigOverride = {
+type TUniversalProviderConfigOverride = {
   methods?: Record<string, Array<string>>
   chains?: Record<string, Array<string>>
   events?: Record<string, Array<string>>
@@ -19,6 +20,7 @@ export class AppKitHelper {
   static solanaAdapter = new SolanaAdapter()
   static neo3Adapter = new Neo3Adapter()
   static stellarAdapter = new StellarAdapter()
+  static bitcoinAdapter = new BitcoinAdapter()
   static eip155Adapter = new WagmiAdapter({
     projectId: this.projectId,
     networks: [
@@ -43,10 +45,11 @@ export class AppKitHelper {
         AppKitNetwork,
         ...Array<AppKitNetwork>,
       ],
-      adapters: [this.solanaAdapter, this.neo3Adapter, this.stellarAdapter, this.eip155Adapter],
+      adapters: [this.solanaAdapter, this.neo3Adapter, this.stellarAdapter, this.bitcoinAdapter, this.eip155Adapter],
       universalProviderConfigOverride: this.mergeUniversalProviderConfigOverride(
         Neo3Constants.OVERRIDES,
-        StellarConstants.OVERRIDES
+        StellarConstants.OVERRIDES,
+        BitcoinConstants.OVERRIDES
       ),
       features: {
         analytics: false,

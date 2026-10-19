@@ -7,8 +7,20 @@ import BaseIcon from '@/assets/icons/base.svg?react'
 import NeoxIcon from '@/assets/icons/neox.svg?react'
 import PolygonIcon from '@/assets/icons/polygon.svg?react'
 import SolanaIcon from '@/assets/icons/solana.svg?react'
+import StellarIcon from '@/assets/icons/stellar.svg?react'
+import BitcoinIcon from '@/assets/icons/bitcoin.svg?react'
 
-const icons = [Neo3Icon, EthereumIcon, ArbitrumIcon, BaseIcon, NeoxIcon, PolygonIcon, SolanaIcon]
+const icons = [
+  Neo3Icon,
+  EthereumIcon,
+  ArbitrumIcon,
+  BaseIcon,
+  NeoxIcon,
+  PolygonIcon,
+  SolanaIcon,
+  StellarIcon,
+  BitcoinIcon,
+]
 
 export function InteractiveBackground() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -35,7 +47,9 @@ export function InteractiveBackground() {
     const handleMouseMove = (event: MouseEvent) => {
       setMousePos({ x: event.clientX, y: event.clientY })
     }
+
     window.addEventListener('mousemove', handleMouseMove)
+
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 

@@ -1,7 +1,7 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-04
+last_updated: 2026-10-19
 version: 0.1
 ---
 
@@ -53,6 +53,7 @@ Organized as: **symptom → likely cause → fixes / interpretation**.
 - Validate chain/network at connect time.
 - Prompt user to switch network (where supported) with clear instructions.
 - Log chainId/network in telemetry for failures.
+- NeoX anti-MEV: the anti-MEV networks are separate entries (`neoXAntiMevMainnetNetwork` / `neoXAntiMevTestnetNetwork`) with their own RPC; `isAntiMevNetwork(network)` tells which one is active.
 
 ## Case 4 — Insufficient funds / fee issues
 
@@ -67,6 +68,7 @@ Organized as: **symptom → likely cause → fixes / interpretation**.
 - Show user a clear message: they need native token for fees.
 - Re-estimate fees right before submission.
 - Provide a "copy address" flow and link to funding instructions (if applicable).
+- Bitcoin: `sendTransfer` takes `amount` in **satoshis** (string); passing BTC units sends 100,000,000x less than intended or fails on dust limits.
 
 ## Case 5 — User rejected signature/transaction
 
@@ -95,6 +97,34 @@ Organized as: **symptom → likely cause → fixes / interpretation**.
 - Implement confirmation polling with backoff + timeout.
 - Offer a block explorer link immediately after broadcast.
 - After timeout, show "pending" state with manual refresh.
+
+## Case 7 — Bitcoin balance always 0
+
+### Symptom
+- Connected to Bitcoin, but AppKit shows a 0 BTC balance.
+
+### Likely causes
+- `BitcoinAdapter` reads balances from the mempool.space REST API (`https://mempool.space/api`, `https://mempool.space/testnet/api`); request failures are swallowed and reported as 0.
+- CSP / adblock / proxy blocks `mempool.space`, or the API rate-limits you.
+- The wallet address belongs to the other network (mainnet vs testnet).
+
+### Fixes / checks
+- Allow `https://mempool.space` in `connect-src`.
+- Check the network tab for the `/address/<address>` request.
+- Confirm the active network matches the address type (`bc1...` mainnet, `tb1...` testnet).
+
+## Case 8 — NeoX anti-MEV send fails or prompts several times
+
+### Symptom
+- On an anti-MEV network, the wallet prompts several times (transaction, message signature, transaction again), or the send fails with "transaction cached"-style errors.
+
+### Likely causes
+- Expected: the anti-MEV flow sends the transaction (cached by the node), asks for a nonce signature, then sends the encrypted envelope.
+- Plain wagmi `sendTransaction` used instead of the package's, so the cached transaction is never wrapped.
+
+### Fixes / checks
+- Use `sendTransaction` / `signTransaction` from `@cityofzion/appkit-neox-adapter` with `wagmiAdapter.wagmiConfig`.
+- Explain the multiple prompts in the UI.
 
 ## Error categorization (recommended)
 - Misconfiguration

@@ -18,7 +18,7 @@ export class StellarConstants {
     "stellar_getNetwork",
   ];
 
-  static readonly EVENTS: string[] = [];
+  static readonly EVENTS: string[] = ["accountsChanged", "chainChanged"];
 
   static readonly OVERRIDES: {
     methods?: Record<string, string[]>;
@@ -27,10 +27,10 @@ export class StellarConstants {
     rpcMap?: Record<string, string>;
   } = {
     methods: {
-      stellar: this.METHODS,
+      stellar: StellarConstants.METHODS,
     },
     events: {
-      stellar: this.EVENTS,
+      stellar: StellarConstants.EVENTS,
     },
   };
 }

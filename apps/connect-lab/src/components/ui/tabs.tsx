@@ -18,7 +18,7 @@ function List({ className, ...props }: React.ComponentProps<typeof TabsPrimitive
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
-      className="flex w-fit items-center justify-center gap-1 rounded-2xl border border-white/5 p-1 shadow-inner group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col"
+      className="flex w-fit items-center justify-center gap-1 rounded-2xl border border-white/5 shadow-inner group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col"
       {...props}
     />
   )
@@ -29,7 +29,7 @@ function Trigger({ className, ...props }: React.ComponentProps<typeof TabsPrimit
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={StyleHelper.merge(
-        "font-grotesk hover:text-foreground relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-lg border border-transparent px-6 py-2.5 text-xs font-black whitespace-nowrap text-slate-500 transition-all duration-300 group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:bg-white/5 focus-visible:border-blue-500 focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "font-grotesk hover:text-foreground relative inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-transparent px-6 py-2.5 text-xs font-black whitespace-nowrap text-slate-500 transition-all duration-300 group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:bg-white/5 focus-visible:border-blue-500 focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 max-sm:px-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         'data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/20',
         className
       )}

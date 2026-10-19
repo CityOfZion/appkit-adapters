@@ -2,7 +2,7 @@
 
 Status: draft
 Owner: Trinity
-Last updated: 2026-03-04
+Last updated: 2026-10-19
 
 ## Purpose
 
@@ -15,20 +15,32 @@ Provide a **quick entrypoint** for validating the AppKit adapters skill locally 
 
 ## Quick local smoke flow
 
-Run these from the skill root: `AKB/SKILLS/appkit-adapters/`.
+The skill lives at `skills/appkit-adapters/` inside the appkit-adapters repo.
 
-### 1) Build the canonical example
+### 0) Build the adapter packages
 
-Canonical validation target:
-
-- `examples/vite-react-neo3/`
-
-Commands:
+Both examples link the adapters via `file:../../../../packages/<name>`, so build them first, from the repo root:
 
 ```bash
-cd examples/vite-react-neo3
+rush install
+rush build-packages
+```
 
-# canonical
+(Without a global Rush: `node common/scripts/install-run-rush.js install` / `... build-packages`.)
+
+### 1) Build the examples
+
+Validation targets:
+
+- `examples/vite-react-neo3/` (canonical; Neo3 only)
+- `examples/simple-app/` (multi-chain: Neo3 + Stellar + Bitcoin + NeoX via `WagmiAdapter`, testnets)
+
+Commands (from `skills/appkit-adapters/`):
+
+```bash
+cd examples/vite-react-neo3   # or examples/simple-app
+
+cp .env.example .env          # set VITE_REOWN_PROJECT_ID for runtime checks
 pnpm install
 pnpm build
 
@@ -36,14 +48,19 @@ pnpm build
 pnpm dev
 ```
 
+Or run both in one go: `tests/ci-samples/local-smoke.sh`.
+
 Notes:
 - In constrained agent/CI runners, `npm install` may hit strict time caps. Prefer `pnpm` + caching.
+- If install fails resolving `file:` dependencies or `dist/` is missing, re-run step 0.
 - If the build fails due to imports, first re-check the import-path rule:
   - install: `@reown/appkit`
   - import react helpers: `@reown/appkit/react` (subpath)
   - never install: `@reown/appkit/react`
 
 ### 2) Optional lint
+
+`vite-react-neo3` defines a lint script:
 
 ```bash
 pnpm lint
@@ -56,5 +73,5 @@ pnpm lint
 
 ## Relation to examples
 
-- Examples under `examples/` (especially `vite-react-neo3`) are used as **validation targets**.
+- Examples under `examples/` (`vite-react-neo3` and `simple-app`) are used as **validation targets**.
 - `examples/VALIDATION_LOG.md` records when and how examples were last validated.

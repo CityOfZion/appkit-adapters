@@ -1,7 +1,7 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-04
+last_updated: 2026-10-19
 version: 0.1
 ---
 
@@ -14,6 +14,8 @@ Use this before shipping a wallet connect flow to users.
 - [ ] Disconnect works and clears local session state as expected.
 - [ ] Switching accounts updates app state correctly.
 - [ ] Switching networks updates app state correctly.
+- [ ] Mainnet vs testnet: each chain (Neo3, Stellar, Bitcoin, NeoX) targets the intended network in the release build.
+- [ ] NeoX: anti-MEV networks only use `sendTransaction` / `signTransaction` from `@cityofzion/appkit-neox-adapter`.
 
 ## Edge cases
 - [ ] No wallet installed: user sees a helpful path forward.
@@ -34,7 +36,7 @@ Use this before shipping a wallet connect flow to users.
   - [ ] transaction requested / broadcasted / failed
 - [ ] Logs/telemetry include non-sensitive context:
   - [ ] adapter name
-  - [ ] chain/network
+  - [ ] chain/network (namespace: `neo3`, `stellar`, `bip122`, `eip155`)
   - [ ] error category (see troubleshooting docs)
 
 ## Security / privacy
