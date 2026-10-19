@@ -15,7 +15,7 @@ export function RequestModal() {
         <Dialog.Content
           onInteractOutside={event => event.preventDefault()}
           className={StyleHelper.merge({
-            'max-h-[90dvh] min-h-130 w-sm min-w-160 resize duration-0 sm:max-w-[90dvw]':
+            'max-h-[90dvh] min-h-130 w-sm min-w-160 resize duration-0 max-sm:min-w-80 sm:max-w-[90dvw]':
               requestState.status === 'success' || requestState.status === 'error',
           })}
         >
@@ -39,7 +39,7 @@ export function RequestModal() {
             <Dialog.Body className="items-center text-center">
               <div className="flex animate-pulse flex-col items-center gap-4">
                 <Spinner />
-                <p className="font-brand text-lg font-bold text-white">Awaiting Confirmation</p>
+                <p className="text-lg font-bold text-white">Awaiting Confirmation</p>
                 <p className="max-w-sm text-sm leading-relaxed text-slate-500">
                   Please check your wallet for the incoming {requestState.method} request.
                 </p>

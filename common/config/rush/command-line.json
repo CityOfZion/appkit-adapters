@@ -16,7 +16,15 @@
       "commandKind": "global",
       "summary": "Exec all packages build command",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "rush build --only tag:packages"
+      "shellCommand": "node common/scripts/install-run-rush.js build --only tag:packages"
+    },
+    {
+      "name": "lint",
+      "commandKind": "bulk",
+      "summary": "Exec all projects lint command",
+      "enableParallelism": true,
+      "ignoreDependencyOrder": true,
+      "ignoreMissingScript": true
     }
     // {
     //   /**

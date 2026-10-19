@@ -10,21 +10,21 @@ You can access the deployed project here: [Connect Lab on GitHub Pages](https://
 
 This adapter enables seamless integration of Stellar blockchain functionality with [Reown AppKit](https://docs.reown.com/appkit) (formerly WalletConnect AppKit), allowing developers to build Stellar-enabled dApps with WalletConnect support.
 
-> **💡 Need a working example?** Check out the [Connect Lab](../../apps/connect-lab/) project for a complete implementation demonstrating how to use this adapter in a real-world application.
+> **💡 Need a working example?** Check out the [Connect Lab](../../apps/connect-lab) project for a complete implementation demonstrating how to use this adapter in a real-world application.
 
 > **📚 Learn more about AppKit:** Visit the official [Reown AppKit repository](https://github.com/reown-com/appkit) for comprehensive documentation, examples, and the latest updates on AppKit features.
 
 ## Installation
 
 ```bash
-npm install @cityofzion/appkit-stellar-adapter
+npm install @cityofzion/appkit-stellar-adapter @reown/appkit @reown/appkit-common @reown/appkit-controllers @walletconnect/universal-provider
 ```
 
 ## Usage
 
 ### Basic Setup
 
-> **⚠️ IMPORTANT:** You **must** include the `universalProviderConfigOverride` option with `StellarConstants.OVERRIDES`. This is required because AppKit does not include Stellar methods in its default configuration.
+> **⚠️ IMPORTANT:** You **must** include the `universalProviderConfigOverride` option with `StellarConstants.OVERRIDES`. This is required because AppKit does not include Stellar methods in its default configuration. When using more than one adapter, merge every adapter's `OVERRIDES` per namespace into a single object (AppKit accepts only one).
 
 ```typescript
 import { StellarAdapter, stellarMainnetNetwork, stellarTestnetNetwork, StellarConstants } from '@cityofzion/appkit-stellar-adapter';
@@ -143,7 +143,7 @@ function ConnectButton() {
 
   async function handleDisconnect() {
     //@ts-expect-error ChainNamespace does not include stellar
-    await disconnect({ namespace: : "stellar" });
+    await disconnect({ namespace: "stellar" });
   };
 
   return (

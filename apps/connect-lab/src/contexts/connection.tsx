@@ -6,12 +6,13 @@ import type { CaipNetwork } from '@reown/appkit/react'
 import type { ChainNamespace } from '@reown/appkit/networks'
 import type { TSupportedChain } from '@/helpers/chain'
 import { ChainHelper } from '@/helpers/chain'
+import { UtilsHelper } from '@/helpers/utils'
 
-export type TConnectingConnectionInfo = {
+type TConnectingConnectionInfo = {
   status: 'connecting'
 }
 
-export type TConnectedConnectionInfo = {
+type TConnectedConnectionInfo = {
   status: 'connected'
   loading: false
   address: string
@@ -26,12 +27,12 @@ export type TConnectedConnectionInfo = {
   }
 }
 
-export type TNotConnectedConnectionInfo = {
+type TNotConnectedConnectionInfo = {
   status: 'not_connected'
   loading: false
 }
 
-export type TConnectionInfo = TConnectingConnectionInfo | TConnectedConnectionInfo | TNotConnectedConnectionInfo
+type TConnectionInfo = TConnectingConnectionInfo | TConnectedConnectionInfo | TNotConnectedConnectionInfo
 
 type TConnectionProviderState = {
   connectionInfo: TConnectionInfo
@@ -66,20 +67,25 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
   }
 
   useEffect(() => {
+    let isCancelled = false
+
     async function handle() {
       if (appKitAccountState.status === 'connecting' || appKitAccountState.status === 'reconnecting') {
         setConnectionInfo({
           status: 'connecting',
         })
+
         return
       }
 
       // This is a workaround to prevent a flash of the initial page
       if (isFirstRender.current) {
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        isFirstRender.current = false
+
+        await UtilsHelper.sleep(2000)
       }
 
-      isFirstRender.current = false
+      if (isCancelled) return
 
       if (!appKitAccountState.caipAddress) {
         setConnectionInfo({
@@ -90,7 +96,6 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
       }
 
       const [connectedNamespace, connectedNetworkId, connectedAddress] = appKitAccountState.caipAddress.split(':')
-
       let connectedChain: TSupportedChain | undefined
 
       for (const chain of ChainHelper.supportedChains) {
@@ -134,6 +139,10 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
     }
 
     handle()
+
+    return () => {
+      isCancelled = true
+    }
   }, [appKitAccountState.caipAddress, appKitAccountState.status])
 
   return (

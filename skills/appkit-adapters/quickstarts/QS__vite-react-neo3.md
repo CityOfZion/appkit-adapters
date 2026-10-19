@@ -1,8 +1,8 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-25
-version: 0.2
+last_updated: 2026-10-19
+version: 0.3
 ---
 
 # Quickstart — Vite + React (TS) + Neo3
@@ -19,21 +19,34 @@ cd vite-react-neo3
 
 ## 2) Install dependencies
 
-Published-package shape:
+Install the adapter together with its required peer dependencies:
 
 ```bash
-pnpm add @reown/appkit @cityofzion/appkit-neo3-adapter react react-dom
+pnpm add @cityofzion/appkit-neo3-adapter @reown/appkit @reown/appkit-common @reown/appkit-controllers @walletconnect/universal-provider
 ```
 
-If you are wiring against local adapter source in this monorepo-style pattern, also ensure these Reown packages are resolvable from the app:
+`@reown/appkit-common`, `@reown/appkit-controllers`, and `@walletconnect/universal-provider` are required peers of the adapter, not optional extras; builds fail to resolve imports without them. `@cityofzion/neon-dappkit-types` is a regular dependency of the adapter, so install it only if you import its types directly.
+
+Inside this repository, `examples/vite-react-neo3` depends on the adapter through a local link (`"@cityofzion/appkit-neo3-adapter": "file:../../../../packages/appkit-neo3-adapter"`). Build the packages first from the repository root:
 
 ```bash
-pnpm add @reown/appkit-common@1.8.19 @reown/appkit-controllers@1.8.19
+rush install
+rush build-packages
 ```
 
-## 3) Bootstrap AppKit in `src/main.tsx`
+## 3) Configure the project id
 
-```ts
+Create `.env` (the example ships an `.env.example`):
+
+```bash
+VITE_REOWN_PROJECT_ID=your_project_id_here
+```
+
+Get a project id from https://cloud.reown.com.
+
+## 4) Bootstrap AppKit in `src/main.tsx`
+
+```tsx
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createAppKit } from '@reown/appkit/react'
@@ -78,28 +91,56 @@ createRoot(document.getElementById('root')!).render(
 )
 ```
 
-## 4) Use the Neo3 provider in `src/App.tsx`
+## 5) Use the Neo3 provider in `src/App.tsx`
 
-```ts
+```tsx
+import { useState } from 'react'
 import { useAppKit, useAppKitAccount, useAppKitProvider } from '@reown/appkit/react'
-import type { Neo3Provider } from '@cityofzion/appkit-neo3-adapter'
+import { Neo3Constants, type Neo3Provider } from '@cityofzion/appkit-neo3-adapter'
 
-function Example() {
+export default function App() {
   const { open } = useAppKit()
   const account = useAppKitAccount()
   // @ts-expect-error AppKit types do not yet include the neo3 namespace.
   const { walletProvider } = useAppKitProvider<Neo3Provider>('neo3')
+  const [result, setResult] = useState('')
 
   async function connectNeo3() {
     // @ts-expect-error AppKit types do not yet include the neo3 namespace.
     await open({ namespace: 'neo3' })
   }
 
-  return null
+  async function readGasBalance() {
+    if (!walletProvider || !account.address) return
+
+    const invokeResult = await walletProvider.testInvoke({
+      invocations: [
+        {
+          scriptHash: Neo3Constants.GAS_TOKEN.hash,
+          operation: 'balanceOf',
+          args: [{ type: 'Hash160', value: account.address }],
+        },
+      ],
+      signers: [{ scopes: 'CalledByEntry' }],
+    })
+
+    setResult(JSON.stringify(invokeResult, null, 2))
+  }
+
+  return (
+    <main>
+      <p>{account.isConnected ? account.address : 'Not connected'}</p>
+      <button onClick={connectNeo3}>Connect Neo3 wallet</button>
+      <button onClick={readGasBalance} disabled={!walletProvider}>
+        testInvoke(balanceOf)
+      </button>
+      {result ? <pre>{result}</pre> : null}
+    </main>
+  )
 }
 ```
 
-## 5) Verify
+## 6) Verify
 
 ```bash
 pnpm build
@@ -109,4 +150,5 @@ pnpm build
 
 - `Neo3Constants.OVERRIDES` is required.
 - The validated example uses `createAppKit` from `@reown/appkit/react` during bootstrap.
-- Current AppKit typings still require targeted `@ts-expect-error` directives for the `neo3` namespace in the example.
+- AppKit's `ChainNamespace` does not include `neo3`, so targeted `@ts-expect-error` directives are required at the `'neo3'` call sites.
+- For the full provider method list and the `invokeFunction` shape, see [ADAPTER__neo3.md](../reference/ADAPTER__neo3.md).

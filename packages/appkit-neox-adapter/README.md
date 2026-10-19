@@ -10,14 +10,14 @@ You can access the deployed project here: [Connect Lab on GitHub Pages](https://
 
 **NeoX is a fully EVM-compatible blockchain**, which means it uses the standard Ethereum namespace (`eip155`) and works seamlessly with existing Ethereum adapters. This package provides pre-configured NeoX network definitions and utilities that you can use with the standard `WagmiAdapter` from Reown AppKit.
 
-> **💡 Need a working example?** Check out the [Connect Lab](../../apps/connect-lab/) project for a complete implementation demonstrating how to use NeoX in a real-world application.
+> **💡 Need a working example?** Check out the [Connect Lab](../../apps/connect-lab) project for a complete implementation demonstrating how to use NeoX in a real-world application.
 
 > **📚 Learn more about AppKit:** Visit the official [Reown AppKit repository](https://github.com/reown-com/appkit) for comprehensive documentation, examples, and the latest updates on AppKit features.
 
 ## Installation
 
 ```bash
-npm install @cityofzion/appkit-neox-adapter @reown/appkit-adapter-wagmi @wagmi/core viem
+npm install @cityofzion/appkit-neox-adapter @reown/appkit @reown/appkit-common @reown/appkit-adapter-wagmi @wagmi/core viem wagmi @tanstack/react-query
 ```
 
 ## Anti-MEV Transaction Support
@@ -35,14 +35,16 @@ import { createAppKit } from '@reown/appkit';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { neoXMainnetNetwork, neoXTestnetNetwork, neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork } from '@cityofzion/appkit-neox-adapter';
 
+const projectId = 'YOUR_PROJECT_ID'; // Get from https://cloud.reown.com
+const networks = [neoXMainnetNetwork, neoXTestnetNetwork]; // Or [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork]
 
-const wagmiAdapter = new WagmiAdapter()
+const wagmiAdapter = new WagmiAdapter({ projectId, networks });
 
 // Create AppKit instance with NeoX support
 createAppKit({
-  projectId: 'YOUR_PROJECT_ID', // Get from https://cloud.reown.com
+  projectId,
   adapters: [wagmiAdapter],
-  networks: [neoXMainnetNetwork, neoXTestnetNetwork], // Or [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork]
+  networks,
   metadata: {
     name: 'My NeoX dApp',
     description: 'My NeoX dApp description',
@@ -58,17 +60,19 @@ createAppKit({
 import React from 'react';
 import { AppKitProvider } from "@reown/appkit/react";
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import { neoXMainnetNetwork, neoXTestnetNetwork, neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork  } from '@cityofzion/appkit-neox-adapter';
+import { neoXMainnetNetwork, neoXTestnetNetwork, neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork } from '@cityofzion/appkit-neox-adapter';
 
-const wagmiAdapter = new WagmiAdapter()
+const projectId = 'YOUR_PROJECT_ID';
+const networks = [neoXMainnetNetwork, neoXTestnetNetwork]; // Or [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork]
 
+const wagmiAdapter = new WagmiAdapter({ projectId, networks });
 
 function App() {
   return (
     <AppKitProvider
       adapters={[wagmiAdapter]}
-      networks={[neoXMainnetNetwork, neoXTestnetNetwork]} // Or [neoXAntiMevMainnetNetwork, neoXAntiMevTestnetNetwork]
-      projectId='YOUR_PROJECT_ID'
+      networks={networks}
+      projectId={projectId}
       metadata={{
         name: 'My NeoX dApp',
         description: 'My NeoX dApp description',
@@ -95,38 +99,46 @@ The package exports pre-configured NeoX networks:
 
 ### Sending Transactions
 
-> **⚠️ IMPORTANT:** Always use the transaction methods from `@cityofzion/appkit-neox-adapter` instead of the standard Wagmi hooks. The package methods automatically handle Anti-MEV protection when connected to Anti-MEV networks, while standard Wagmi methods do not.
+The package exports two pairs of actions. All of them take the wagmi config (`wagmiAdapter.wagmiConfig`) as the first argument:
+
+- `sendTransaction` / `signTransaction` — send or sign the transaction as-is.
+- `sendAntiMevTransaction` / `signAntiMevTransaction` — always wrap the transaction in an encrypted Anti-MEV envelope before sending or signing it. The wallet is asked for several signatures: the original transaction (cached by the node, not broadcast), a message over the nonce, then the envelope transaction.
+
+Standard Wagmi actions never apply Anti-MEV protection.
 
 ```tsx
-import { useConfig } from 'wagmi';
-import { sendTransaction } from '@cityofzion/appkit-neox-adapter';
-import { parseEther, Hex } from 'viem';
+import { sendAntiMevTransaction, sendTransaction } from '@cityofzion/appkit-neox-adapter';
+import { parseEther, type Hex } from 'viem';
+
+const to: Hex = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb';
 
 function MyComponent() {
-  const config = useConfig();
-
   const handleSendTransaction = async () => {
-    try {
-      // This method automatically detects if Anti-MEV is active
-      // and routes transactions accordingly
-      const result = await sendTransaction(config, {
-        to: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb' as Hex,
-        value: parseEther('0.001'),
-      });
+    const hash = await sendTransaction(wagmiAdapter.wagmiConfig, { to, value: parseEther('0.001') });
 
-      console.log("Transaction sent:", result);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    console.log('Transaction sent:', hash);
+  };
+
+  const handleSendAntiMevTransaction = async () => {
+    const hash = await sendAntiMevTransaction(wagmiAdapter.wagmiConfig, { to, value: parseEther('0.001') });
+
+    console.log('Anti-MEV transaction sent:', hash);
   };
 
   return (
-    <button onClick={handleSendTransaction}>
-      Send Transaction
-    </button>
+    <>
+      <button onClick={handleSendTransaction}>Send Transaction</button>
+      <button onClick={handleSendAntiMevTransaction}>Send Anti-MEV Transaction</button>
+    </>
   );
 }
 ```
+
+### Helpers
+
+- `getAntiMevNetwork(chainId)` — returns `neoXAntiMevMainnetNetwork` for the mainnet chain id, `neoXAntiMevTestnetNetwork` otherwise.
+- `isAntiMevNetwork(network)` — whether a network points to an Anti-MEV RPC.
+- `buildAntiMevTransaction(wagmiConfig, params)` / `getCachedTransaction(wagmiConfig, { nonce, signature, chainId? })` — lower-level steps of the Anti-MEV flow.
 
 ## Contributing
 

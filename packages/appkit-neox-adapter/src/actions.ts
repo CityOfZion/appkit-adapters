@@ -1,12 +1,10 @@
 import {
-  getConnectorClient,
-  getTransactionCount,
-  readContract,
-  sendTransaction as wagmi_sendTransaction,
-  signTransaction as wagmi_signTransaction,
-  signMessage,
   type Config,
+  getConnectorClient,
+  sendTransaction as wagmi_sendTransaction,
   type SendTransactionParameters,
+  signMessage,
+  signTransaction as wagmi_signTransaction,
   type SignTransactionParameters,
 } from "@wagmi/core";
 import { neoxMainnet } from "viem/chains";
@@ -16,20 +14,22 @@ import {
 } from "./networks.js";
 import type { ChainIdParameter, Compute } from "@wagmi/core/internal";
 import {
+  type Chain,
+  concat,
   createPublicClient,
-  http,
+  getChainContractAddress,
   type Hex,
+  http,
+  keccak256,
+  pad,
+  parseTransaction,
+  type PublicClient,
   toBytes,
   toHex,
-  getChainContractAddress,
-  pad,
-  keccak256,
-  concat,
 } from "viem";
 import { governanceAbi } from "./abis/governance.js";
 import { keyManagementAbi } from "./abis/key-management.js";
 import { getConsensusThreshold, getScaler, PublicKey } from "neox-tpke";
-import { parseTransaction } from "viem/celo";
 import type { AppKitNetwork } from "@reown/appkit-common";
 
 export type GetCachedTransactionParameters<config extends Config = Config> =
@@ -40,19 +40,38 @@ export type GetCachedTransactionParameters<config extends Config = Config> =
     }
   >;
 
+export function getAntiMevNetwork(chainId: number | string) {
+  return chainId === neoxMainnet.id
+    ? neoXAntiMevMainnetNetwork
+    : neoXAntiMevTestnetNetwork;
+}
+
 export function isAntiMevNetwork(network: AppKitNetwork) {
-  const antiMevNetwork =
-    network.id === neoxMainnet.id
-      ? neoXAntiMevMainnetNetwork
-      : neoXAntiMevTestnetNetwork;
+  const antiMevNetwork = getAntiMevNetwork(network.id);
 
-  if (
+  return (
     network.rpcUrls.default.http[0] === antiMevNetwork.rpcUrls.default.http[0]
-  ) {
-    return true;
-  }
+  );
+}
 
-  return false;
+function createAntiMevPublicClient(chain: Chain) {
+  const antiMevNetwork = getAntiMevNetwork(chain.id);
+
+  return createPublicClient({
+    chain,
+    transport: http(antiMevNetwork.rpcUrls.default.http[0]),
+  });
+}
+
+function requestCachedTransaction(
+  publicClient: PublicClient,
+  nonce: number,
+  signature: string,
+) {
+  return publicClient.request<{ ReturnType: Hex }>({
+    method: "eth_getCachedTransaction",
+    params: [toHex(nonce), signature],
+  });
 }
 
 export async function getCachedTransaction<config extends Config>(
@@ -62,18 +81,9 @@ export async function getCachedTransaction<config extends Config>(
   const { nonce, signature, chainId } = parameters;
 
   const client = await getConnectorClient(config, { chainId });
+  const publicClient = createAntiMevPublicClient(client.chain);
 
-  const publicClient = createPublicClient({
-    chain: client.chain,
-    transport: http(),
-  });
-
-  const transaction = await publicClient.request<{ ReturnType: Hex }>({
-    method: "eth_getCachedTransaction",
-    params: [toHex(nonce), signature],
-  });
-
-  return transaction;
+  return await requestCachedTransaction(publicClient, nonce, signature);
 }
 
 export async function buildAntiMevTransaction(
@@ -82,11 +92,12 @@ export async function buildAntiMevTransaction(
 ) {
   const client = await getConnectorClient(wagmiConfig);
 
-  if (!client?.chain || !client.account)
-    throw new Error("No chain found in client");
+  if (!client?.chain) throw new Error("No chain found in client");
+  if (!client.account) throw new Error("No account found in client");
 
-  const nonce = await getTransactionCount(wagmiConfig, {
-    chainId: client.chain.id,
+  const publicClient = createAntiMevPublicClient(client.chain);
+
+  const nonce = await publicClient.getTransactionCount({
     blockTag: "pending",
     address: client.account.address,
   });
@@ -110,14 +121,13 @@ export async function buildAntiMevTransaction(
     message: nonce.toString(),
   });
 
-  const cachedTransaction = await getCachedTransaction(wagmiConfig, {
-    chainId: client.chain.id,
+  const cachedTransaction = await requestCachedTransaction(
+    publicClient,
     nonce,
     signature,
-  });
+  );
 
-  const consensusSize = await readContract(wagmiConfig, {
-    chainId: client.chain.id,
+  const consensusSize = await publicClient.readContract({
     address: getChainContractAddress({
       chain: client.chain,
       contract: "governance",
@@ -126,8 +136,7 @@ export async function buildAntiMevTransaction(
     functionName: "consensusSize",
   });
 
-  const roundNumber = await readContract(wagmiConfig, {
-    chainId: client.chain.id,
+  const roundNumber = await publicClient.readContract({
     address: getChainContractAddress({
       chain: client.chain,
       contract: "keyManagement",
@@ -136,8 +145,7 @@ export async function buildAntiMevTransaction(
     functionName: "roundNumber",
   });
 
-  const aggregatedCommitment = await readContract(wagmiConfig, {
-    chainId: client.chain.id,
+  const aggregatedCommitment = await publicClient.readContract({
     address: getChainContractAddress({
       chain: client.chain,
       contract: "keyManagement",
@@ -186,16 +194,19 @@ export async function signTransaction(
 
   if (!client?.chain) throw new Error("No chain found in client");
 
-  if (!isAntiMevNetwork(client.chain)) {
-    return await wagmi_signTransaction(wagmiConfig, transactionData as any);
-  }
+  return await wagmi_signTransaction(wagmiConfig, transactionData as any);
+}
 
-  const buildTransaction = await buildAntiMevTransaction(
+export async function signAntiMevTransaction(
+  wagmiConfig: Config,
+  transactionData: SignTransactionParameters,
+) {
+  const antiMevTransactionData = await buildAntiMevTransaction(
     wagmiConfig,
     transactionData,
   );
 
-  return await wagmi_signTransaction(wagmiConfig, buildTransaction);
+  return await wagmi_signTransaction(wagmiConfig, antiMevTransactionData);
 }
 
 export async function sendTransaction(
@@ -206,14 +217,17 @@ export async function sendTransaction(
 
   if (!client?.chain) throw new Error("No chain found in client");
 
-  if (!isAntiMevNetwork(client.chain)) {
-    return await wagmi_sendTransaction(wagmiConfig, transactionData);
-  }
+  return await wagmi_sendTransaction(wagmiConfig, transactionData);
+}
 
-  const buildTransaction = await buildAntiMevTransaction(
+export async function sendAntiMevTransaction(
+  wagmiConfig: Config,
+  transactionData: SendTransactionParameters,
+) {
+  const antiMevTransactionData = await buildAntiMevTransaction(
     wagmiConfig,
     transactionData,
   );
 
-  return await wagmi_sendTransaction(wagmiConfig, buildTransaction);
+  return await wagmi_sendTransaction(wagmiConfig, antiMevTransactionData);
 }

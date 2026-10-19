@@ -1,3 +1,5 @@
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+dist
+src/routeTree.gen.ts

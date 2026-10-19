@@ -1,7 +1,7 @@
 import { createContext, useState } from 'react'
 import type { Dispatch } from 'react'
 
-export type TRequestState =
+type TRequestState =
   | {
       status: 'idle'
     }

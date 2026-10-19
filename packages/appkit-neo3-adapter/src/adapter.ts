@@ -144,7 +144,7 @@ export class Neo3Adapter extends AdapterBlueprint {
 
       if (!connector?.provider) {
         throw new Error(
-          "StellarAdapter:disconnect - connector.provider is undefined",
+          "Neo3Adapter:disconnect - connector.provider is undefined",
         );
       }
 
@@ -324,7 +324,7 @@ export class Neo3Adapter extends AdapterBlueprint {
   }
 
   public override writeSolanaTransaction(): Promise<AdapterBlueprint.WriteSolanaTransactionResult> {
-    throw new Error("Neo3Adapter:writeContract - Not supported.");
+    throw new Error("Neo3Adapter:writeSolanaTransaction - Not supported.");
   }
 
   public override signMessage(
@@ -361,11 +361,5 @@ export class Neo3Adapter extends AdapterBlueprint {
 
   public override revokePermissions(): Promise<`0x${string}`> {
     throw new Error("Neo3Adapter:revokePermissions - Not supported.");
-  }
-
-  public override switchNetwork(
-    _params: AdapterBlueprint.SwitchNetworkParams,
-  ): Promise<any> {
-    throw new Error("Neo3Adapter:switchNetwork - Not supported.");
   }
 }

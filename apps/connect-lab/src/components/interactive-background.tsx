@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import Neo3Icon from '@/assets/icons/neo3.svg?react'
 import EthereumIcon from '@/assets/icons/ethereum.svg?react'
@@ -7,12 +7,23 @@ import BaseIcon from '@/assets/icons/base.svg?react'
 import NeoxIcon from '@/assets/icons/neox.svg?react'
 import PolygonIcon from '@/assets/icons/polygon.svg?react'
 import SolanaIcon from '@/assets/icons/solana.svg?react'
+import StellarIcon from '@/assets/icons/stellar.svg?react'
+import BitcoinIcon from '@/assets/icons/bitcoin.svg?react'
 
-const icons = [Neo3Icon, EthereumIcon, ArbitrumIcon, BaseIcon, NeoxIcon, PolygonIcon, SolanaIcon]
+const icons = [
+  Neo3Icon,
+  EthereumIcon,
+  ArbitrumIcon,
+  BaseIcon,
+  NeoxIcon,
+  PolygonIcon,
+  SolanaIcon,
+  StellarIcon,
+  BitcoinIcon,
+]
 
 export function InteractiveBackground() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const containerRef = useRef(null)
 
   // Add a depth property (0 = far, 1 = near)
   const renderIcons = useMemo(() => {
@@ -35,16 +46,14 @@ export function InteractiveBackground() {
     const handleMouseMove = (event: MouseEvent) => {
       setMousePos({ x: event.clientX, y: event.clientY })
     }
+
     window.addEventListener('mousemove', handleMouseMove)
+
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
   return (
-    <div
-      ref={containerRef}
-      aria-hidden
-      className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden"
-    >
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-0 size-full overflow-hidden">
       {renderIcons.map(item => {
         // ...existing position logic...
         const iconGlobalX = (item.x / 100) * (typeof window !== 'undefined' ? window.innerWidth : 1000)
