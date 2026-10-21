@@ -1,31 +1,29 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-25
-version: 0.2
+last_updated: 2026-10-19
+version: 0.3
 ---
 
 # Adapter Reference — Neo3
 
 ## Install
 
-Published-package usage:
-
 ```bash
-pnpm add @reown/appkit @cityofzion/appkit-neo3-adapter react react-dom
+pnpm add @cityofzion/appkit-neo3-adapter @reown/appkit @reown/appkit-common @reown/appkit-controllers @walletconnect/universal-provider
 ```
 
-Local monorepo/source-alias usage may also require explicit Reown peer packages:
-
-```bash
-pnpm add @reown/appkit-common@1.8.19 @reown/appkit-controllers@1.8.19
-```
+`@reown/appkit`, `@reown/appkit-common`, `@reown/appkit-controllers`, and `@walletconnect/universal-provider` are required peer dependencies. `@cityofzion/neon-dappkit-types` ships as a regular dependency of the adapter; add it to your app only if you import its types directly.
 
 ## React import rule
 
 - Install `@reown/appkit`
 - Import React APIs from `@reown/appkit/react`
 - Do not install `@reown/appkit/react` as a separate package
+
+## Exports
+
+`Neo3Adapter`, `Neo3Connector`, `Neo3Constants` (`OVERRIDES`, `METHODS`, `EVENTS`, `GAS_TOKEN`), `neo3MainnetNetwork` (`neo3:mainnet`), `neo3TestnetNetwork` (`neo3:testnet`), `ProviderEventEmitter`, and the type `Neo3Provider` (alias of `Neo3Connector`).
 
 ## Validated init snippet
 
@@ -62,9 +60,55 @@ import type { Neo3Provider } from '@cityofzion/appkit-neo3-adapter'
 const { walletProvider } = useAppKitProvider<Neo3Provider>('neo3')
 ```
 
+## Provider methods
+
+Types come from `@cityofzion/neon-dappkit-types`.
+
+| Method | Params | Response |
+|---|---|---|
+| `invokeFunction` | `ContractInvocationMulti` | `string` (transaction id) |
+| `testInvoke` | `ContractInvocationMulti` | `InvokeResult` |
+| `calculateFee` | `ContractInvocationMulti` | `CalculateFee` |
+| `signTransaction` | `ContractInvocationMulti \| BuiltTransaction` | `BuiltTransaction` |
+| `signMessage` | `SignMessagePayload` | `SignedMessage` |
+| `verifyMessage` | `SignedMessage` | `boolean` |
+| `getWalletInfo` | — | `WalletInfo` |
+| `encrypt` | `(message: string, publicKeys?: string[])` | `EncryptedPayload[]` |
+| `decrypt` | `EncryptedPayload` | `string` |
+| `decryptFromArray` | `EncryptedPayload[]` | `DecryptFromArrayResult` |
+
+`ContractInvocationMulti` shape:
+
+```ts
+import type { ContractInvocationMulti } from '@cityofzion/neon-dappkit-types'
+
+const request: ContractInvocationMulti = {
+  invocations: [
+    {
+      scriptHash: '0xd2a4cff31913016155e38e474a2c06d08be276cf', // GAS
+      operation: 'transfer',
+      args: [
+        { type: 'Hash160', value: senderAddress },
+        { type: 'Hash160', value: recipientAddress },
+        { type: 'Integer', value: '100000000' },
+        { type: 'Any', value: null },
+      ],
+      abortOnFail: true, // optional
+    },
+  ],
+  signers: [{ scopes: 'CalledByEntry' }], // optional
+  // optional: extraSystemFee, systemFeeOverride, extraNetworkFee, networkFeeOverride
+}
+
+const txId = await walletProvider.invokeFunction(request)
+```
+
+(Importing the type requires adding `@cityofzion/neon-dappkit-types` to the app.)
+
 ## Capabilities / quirks
 
 - `Neo3Constants.OVERRIDES` is required.
 - The validated example uses `getWalletInfo()` and `testInvoke()` through the wallet-backed provider.
-- Current AppKit typings do not fully model the `neo3` namespace, so targeted `@ts-expect-error` directives are currently needed.
-- If build resolution fails for Reown internal packages in a local-source setup, ensure `@reown/appkit-common` and `@reown/appkit-controllers` are installed in the app.
+- AppKit's `ChainNamespace` does not include `neo3`, so targeted `@ts-expect-error` directives are needed at `useAppKitProvider('neo3')` and `open({ namespace: 'neo3' })`.
+- If build resolution fails for `@reown/appkit-common` / `@reown/appkit-controllers` / `@walletconnect/universal-provider`, a required peer is missing from the app.
+- When combined with other non-EVM adapters, merge `Neo3Constants.OVERRIDES` into one override object (see [REF__universal_provider_overrides.md](./REF__universal_provider_overrides.md)).

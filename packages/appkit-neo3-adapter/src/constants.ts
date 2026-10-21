@@ -19,7 +19,7 @@ export class Neo3Constants {
     "signTransaction",
   ];
 
-  static readonly EVENTS: string[] = [];
+  static readonly EVENTS: string[] = ["accountsChanged", "chainChanged"];
 
   static readonly OVERRIDES: {
     methods?: Record<string, string[]>;
@@ -28,10 +28,10 @@ export class Neo3Constants {
     rpcMap?: Record<string, string>;
   } = {
     methods: {
-      neo3: this.METHODS,
+      neo3: Neo3Constants.METHODS,
     },
     events: {
-      neo3: this.EVENTS,
+      neo3: Neo3Constants.EVENTS,
     },
   };
 }

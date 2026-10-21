@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/esm",
+    "declarationDir": "./dist/types",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "target": "es2021",
+    "types": [],
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

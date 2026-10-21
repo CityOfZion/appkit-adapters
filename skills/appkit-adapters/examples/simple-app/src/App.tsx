@@ -1,70 +1,85 @@
 import { useState } from 'react'
 import { useAppKit, useAppKitAccount, useAppKitProvider } from '@reown/appkit/react'
+import type { BitcoinProvider } from '@cityofzion/appkit-bitcoin-adapter'
 import type { Neo3Provider } from '@cityofzion/appkit-neo3-adapter'
+import { isAntiMevNetwork, neoXTestnetNetwork, sendTransaction } from '@cityofzion/appkit-neox-adapter'
 import type { StellarProvider } from '@cityofzion/appkit-stellar-adapter'
+import type { Hex } from 'viem'
+import { projectId, wagmiAdapter } from './appkit'
+
+type TNamespace = 'neo3' | 'stellar' | 'bip122' | 'eip155'
 
 export default function App() {
-  const projectId = import.meta.env.VITE_REOWN_PROJECT_ID
   const { open } = useAppKit()
   const account = useAppKitAccount()
+  const neoXAccount = useAppKitAccount({ namespace: 'eip155' })
 
   // @ts-expect-error AppKit types do not yet include the neo3 namespace.
   const { walletProvider: neo3Provider } = useAppKitProvider<Neo3Provider>('neo3')
   // @ts-expect-error AppKit types do not yet include the stellar namespace.
   const { walletProvider: stellarProvider } = useAppKitProvider<StellarProvider>('stellar')
-  const [neo3WalletInfo, setNeo3WalletInfo] = useState('')
-  const [stellarNetworkInfo, setStellarNetworkInfo] = useState('')
+  const { walletProvider: bitcoinProvider } = useAppKitProvider<BitcoinProvider>('bip122')
+
+  const [result, setResult] = useState('')
   const [error, setError] = useState('')
 
-  async function connect(namespace: 'neo3' | 'stellar') {
+  async function run(action: () => Promise<unknown>) {
     setError('')
-    setNeo3WalletInfo('')
-    setStellarNetworkInfo('')
+    setResult('')
 
     try {
-      // @ts-expect-error AppKit types do not yet include neo3 and stellar namespaces.
-      await open({ namespace })
+      const response = await action()
+
+      if (response !== undefined) setResult(JSON.stringify(response, null, 2))
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause))
     }
   }
 
-  async function loadNeo3WalletInfo() {
-    if (!neo3Provider) {
-      setError('Connect a Neo3 wallet first.')
-      return
-    }
-
-    setError('')
-
-    try {
-      const result = await neo3Provider.getWalletInfo()
-      setNeo3WalletInfo(JSON.stringify(result, null, 2))
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : String(cause))
-    }
+  function connect(namespace: TNamespace) {
+    // @ts-expect-error AppKit types do not yet include neo3 and stellar namespaces.
+    return run(() => open({ namespace }))
   }
 
-  async function loadStellarNetworkInfo() {
-    if (!stellarProvider) {
-      setError('Connect a Stellar wallet first.')
-      return
-    }
+  function loadNeo3WalletInfo() {
+    return run(async () => {
+      if (!neo3Provider) throw new Error('Connect a Neo3 wallet first.')
 
-    setError('')
+      return await neo3Provider.getWalletInfo()
+    })
+  }
 
-    try {
-      const result = await stellarProvider.getNetwork()
-      setStellarNetworkInfo(JSON.stringify(result, null, 2))
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : String(cause))
-    }
+  function loadStellarNetworkInfo() {
+    return run(async () => {
+      if (!stellarProvider) throw new Error('Connect a Stellar wallet first.')
+
+      return await stellarProvider.getNetwork()
+    })
+  }
+
+  function loadBitcoinAccountAddresses() {
+    return run(async () => {
+      if (!bitcoinProvider) throw new Error('Connect a Bitcoin wallet first.')
+
+      return await bitcoinProvider.getAccountAddresses()
+    })
+  }
+
+  function sendNeoXTransaction() {
+    return run(async () => {
+      if (!neoXAccount.address) throw new Error('Connect a NeoX wallet first.')
+
+      return await sendTransaction(wagmiAdapter.wagmiConfig, {
+        to: neoXAccount.address as Hex,
+        value: 0n,
+      })
+    })
   }
 
   return (
     <div className="shell">
       <h1>Simple AppKit Integration</h1>
-      <p>This example wires Neo3 and Stellar into a single minimal AppKit setup.</p>
+      <p>This example wires Neo3, Stellar, Bitcoin and NeoX into a single minimal AppKit setup.</p>
       <p><strong>Project ID:</strong> {projectId ? 'configured' : 'missing'}</p>
       <p><strong>Status:</strong> {account.status}</p>
       <p><strong>Address:</strong> {account.address ?? 'not connected'}</p>
@@ -76,7 +91,6 @@ export default function App() {
           <button onClick={() => connect('neo3')} disabled={!projectId}>Connect Neo3 wallet</button>
           <button onClick={loadNeo3WalletInfo} disabled={!neo3Provider}>getWalletInfo()</button>
         </div>
-        {neo3WalletInfo ? <pre>{neo3WalletInfo}</pre> : null}
       </section>
 
       <section className="card">
@@ -86,9 +100,30 @@ export default function App() {
           <button onClick={() => connect('stellar')} disabled={!projectId}>Connect Stellar wallet</button>
           <button onClick={loadStellarNetworkInfo} disabled={!stellarProvider}>getNetwork()</button>
         </div>
-        {stellarNetworkInfo ? <pre>{stellarNetworkInfo}</pre> : null}
       </section>
 
+      <section className="card">
+        <h2>Bitcoin</h2>
+        <p>Uses the CityOfZion Bitcoin adapter on the native bip122 namespace.</p>
+        <div className="actions">
+          <button onClick={() => connect('bip122')} disabled={!projectId}>Connect Bitcoin wallet</button>
+          <button onClick={loadBitcoinAccountAddresses} disabled={!bitcoinProvider}>getAccountAddresses()</button>
+        </div>
+      </section>
+
+      <section className="card">
+        <h2>NeoX</h2>
+        <p>
+          Uses Reown's WagmiAdapter with the CityOfZion NeoX networks
+          {isAntiMevNetwork(neoXTestnetNetwork) ? ' (anti-MEV RPC)' : ''}.
+        </p>
+        <div className="actions">
+          <button onClick={() => connect('eip155')} disabled={!projectId}>Connect NeoX wallet</button>
+          <button onClick={sendNeoXTransaction} disabled={!neoXAccount.address}>sendTransaction()</button>
+        </div>
+      </section>
+
+      {result ? <pre>{result}</pre> : null}
       {error ? <pre className="error">{error}</pre> : null}
     </div>
   )

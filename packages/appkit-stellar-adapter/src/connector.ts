@@ -1,13 +1,13 @@
 import {
   ChainController,
+  type Provider,
   WalletConnectConnector,
   WcHelpersUtil,
-  type Provider,
 } from "@reown/appkit-controllers";
 
+import type UniversalProvider from "@walletconnect/universal-provider";
 import type { RequestArguments } from "@walletconnect/universal-provider";
 import { ProviderEventEmitter } from "./emitter.js";
-import type { SessionTypes } from "@walletconnect/types";
 import type { CaipNetwork } from "@reown/appkit-common";
 
 type TStellarConnectorSignXDRRequestResponse = {
@@ -51,7 +51,7 @@ export class StellarConnector
     this.eventEmitter,
   );
 
-  public get session(): SessionTypes.Struct | undefined {
+  public get session(): UniversalProvider["session"] {
     return this.provider.session;
   }
 
@@ -85,6 +85,7 @@ export class StellarConnector
 
   async request<T>(args: RequestArguments): Promise<T> {
     const caipNetwork = ChainController.getCaipNetworkByNamespace(this.chain);
+
     return await this.provider.request(args, caipNetwork?.caipNetworkId);
   }
 
@@ -106,41 +107,33 @@ export class StellarConnector
   async signAndSubmitTransaction(
     xdr: string,
   ): Promise<TStellarConnectorSignAndSubmitXDRResponse> {
-    const resp = await this.request<TStellarConnectorSignAndSubmitXDRResponse>({
+    return await this.request<TStellarConnectorSignAndSubmitXDRResponse>({
       method: "stellar_signAndSubmitXDR",
       params: { xdr },
     });
-
-    return resp;
   }
 
   async signMessage(
     message: string,
   ): Promise<TStellarConnectorSignMessageResponse> {
-    const resp = await this.request<TStellarConnectorSignMessageResponse>({
+    return await this.request<TStellarConnectorSignMessageResponse>({
       method: "stellar_signMessage",
       params: { message },
     });
-
-    return resp;
   }
 
   async signAuthEntry(
     xdr: string,
   ): Promise<TStellarConnectorSignAuthEntryResponse> {
-    const resp = await this.request<TStellarConnectorSignAuthEntryResponse>({
+    return await this.request<TStellarConnectorSignAuthEntryResponse>({
       method: "stellar_signAuthEntry",
       params: { xdr },
     });
-
-    return resp;
   }
 
   async getNetwork(): Promise<TStellarConnectorGetNetworkResponse> {
-    const resp = await this.request<TStellarConnectorGetNetworkResponse>({
+    return await this.request<TStellarConnectorGetNetworkResponse>({
       method: "stellar_getNetwork",
     });
-
-    return resp;
   }
 }

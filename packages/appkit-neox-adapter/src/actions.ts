@@ -1,12 +1,12 @@
 import {
+  type Config,
   getConnectorClient,
   getTransactionCount,
   readContract,
   sendTransaction as wagmi_sendTransaction,
-  signTransaction as wagmi_signTransaction,
-  signMessage,
-  type Config,
   type SendTransactionParameters,
+  signMessage,
+  signTransaction as wagmi_signTransaction,
   type SignTransactionParameters,
 } from "@wagmi/core";
 import { neoxMainnet } from "viem/chains";
@@ -16,20 +16,20 @@ import {
 } from "./networks.js";
 import type { ChainIdParameter, Compute } from "@wagmi/core/internal";
 import {
+  concat,
   createPublicClient,
-  http,
+  getChainContractAddress,
   type Hex,
+  http,
+  keccak256,
+  pad,
   toBytes,
   toHex,
-  getChainContractAddress,
-  pad,
-  keccak256,
-  concat,
 } from "viem";
 import { governanceAbi } from "./abis/governance.js";
 import { keyManagementAbi } from "./abis/key-management.js";
 import { getConsensusThreshold, getScaler, PublicKey } from "neox-tpke";
-import { parseTransaction } from "viem/celo";
+import { parseTransaction } from "viem";
 import type { AppKitNetwork } from "@reown/appkit-common";
 
 export type GetCachedTransactionParameters<config extends Config = Config> =
@@ -46,13 +46,9 @@ export function isAntiMevNetwork(network: AppKitNetwork) {
       ? neoXAntiMevMainnetNetwork
       : neoXAntiMevTestnetNetwork;
 
-  if (
+  return (
     network.rpcUrls.default.http[0] === antiMevNetwork.rpcUrls.default.http[0]
-  ) {
-    return true;
-  }
-
-  return false;
+  );
 }
 
 export async function getCachedTransaction<config extends Config>(
@@ -68,12 +64,10 @@ export async function getCachedTransaction<config extends Config>(
     transport: http(),
   });
 
-  const transaction = await publicClient.request<{ ReturnType: Hex }>({
+  return await publicClient.request<{ ReturnType: Hex }>({
     method: "eth_getCachedTransaction",
     params: [toHex(nonce), signature],
   });
-
-  return transaction;
 }
 
 export async function buildAntiMevTransaction(

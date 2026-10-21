@@ -1,24 +1,30 @@
 # GHA__vite-react-neo3.yml
-# Sample (non-binding) GitHub Actions workflow for validating the canonical example.
-# Intended as a reference scaffold that can be copied into .github/workflows/ in the AKB repo.
+# Sample (non-binding) GitHub Actions workflow for validating the skill examples
+# (vite-react-neo3 and simple-app). Copy into .github/workflows/ of the appkit-adapters repo.
+#
+# The examples link the adapters via `file:../../../../packages/<name>`, so the Rush
+# packages must be installed and built before installing the example.
 
-name: skill-examples__vite-react-neo3
+name: skill-examples
 
 on:
   push:
     paths:
-      - 'AKB/SKILLS/appkit-adapters/**'
+      - 'skills/appkit-adapters/**'
+      - 'packages/**'
   pull_request:
     paths:
-      - 'AKB/SKILLS/appkit-adapters/**'
+      - 'skills/appkit-adapters/**'
+      - 'packages/**'
 
 jobs:
-  install-and-build-vite-react-neo3:
+  install-and-build-example:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        node: [20.x]
+        example: [vite-react-neo3, simple-app]
 
     defaults:
       run:
@@ -26,47 +32,38 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      # NOTE: This is a reference workflow; adapt Node version, pnpm version, and paths to your environment.
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-          # Native pnpm cache support in setup-node (recommended)
-          cache: 'pnpm'
-
+      # pnpm must be on PATH before setup-node can use `cache: 'pnpm'`.
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9 # matches packageManager pnpm@9.15.9 in the examples
           run_install: false
 
-      # Optional: explicit cache (use if you prefer actions/cache instead of setup-node caching)
-      # - name: Cache pnpm store
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       ~/.pnpm-store
-      #       ~/.local/share/pnpm/store
-      #     key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pnpm-store-
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: skills/appkit-adapters/examples/${{ matrix.example }}/pnpm-lock.yaml
 
-      - name: Install + build (vite-react-neo3)
-        working-directory: AKB/SKILLS/appkit-adapters/examples/vite-react-neo3
+      - name: Rush install
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Build adapter packages
+        run: node common/scripts/install-run-rush.js build-packages
+
+      - name: Install + build (${{ matrix.example }})
+        working-directory: skills/appkit-adapters/examples/${{ matrix.example }}
         run: |
           pnpm -v
           node -v
           pnpm install --frozen-lockfile
           pnpm build
 
-      # Optional: add lint/typecheck if the example defines those scripts.
+      # Optional: vite-react-neo3 defines a `lint` script.
       # - name: Lint
-      #   working-directory: AKB/SKILLS/appkit-adapters/examples/vite-react-neo3
+      #   if: matrix.example == 'vite-react-neo3'
+      #   working-directory: skills/appkit-adapters/examples/${{ matrix.example }}
       #   run: pnpm lint
-      #
-      # - name: Typecheck
-      #   working-directory: AKB/SKILLS/appkit-adapters/examples/vite-react-neo3
-      #   run: pnpm typecheck

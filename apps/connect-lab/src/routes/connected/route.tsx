@@ -4,6 +4,7 @@ import { Fragment, useTransition } from 'react'
 import { RequestModal } from './-request-modal'
 import { InfoBox } from './-info-box'
 import { CustomRequest } from './-custom-request'
+import { NeoxRpcToggle } from './-neox-rpc-toggle'
 import type { TSupportedChain } from '@/helpers/chain'
 import type { ComponentType } from 'react'
 import { Button } from '@/components/ui/button'
@@ -14,11 +15,12 @@ import { EIP155Methods } from '@/components/methods/eip155-methods'
 import { SolanaMethods } from '@/components/methods/solana-methods'
 import { Neo3Methods } from '@/components/methods/neo3-methods'
 import { StellarMethods } from '@/components/methods/stellar-methods'
-
+import { BitcoinMethods } from '@/components/methods/bitcoin-methods'
 import { NeoxMethods } from '@/components/methods/neox-methods'
 import { Tabs } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
 import { CopyButton } from '@/components/copy-button'
+import { StyleHelper } from '@/helpers/style'
 
 export const Route = createFileRoute('/connected')({
   component: RouteComponent,
@@ -30,16 +32,15 @@ const methodsComponentByChain: Record<TSupportedChain, ComponentType> = {
   ethereum: EIP155Methods,
   arbitrum: EIP155Methods,
   base: EIP155Methods,
-  // TODO: Fix that
   neox: NeoxMethods,
   polygon: EIP155Methods,
   solana: SolanaMethods,
   stellar: StellarMethods,
+  bitcoin: BitcoinMethods,
 }
 
 function RouteComponent() {
   const { connectionInfo, disconnect } = useConnection()
-
   const [isDisconnecting, startDisconnect] = useTransition()
 
   if (connectionInfo.status !== 'connected') {
@@ -49,11 +50,22 @@ function RouteComponent() {
   const MethodComponent = methodsComponentByChain[connectionInfo.chain]
   const chainInfo = ChainHelper.chainInfos[connectionInfo.chain]
 
-  const addressExplorerUrl = chainInfo.addressUrlTemplate[connectionInfo.networkId] as string | undefined
-  const replacedAddressExplorerUrl = addressExplorerUrl?.replace('{address}', connectionInfo.address)
+  const addressExplorerUrl = chainInfo.addressUrlTemplate[connectionInfo.networkId]?.replace(
+    '{address}',
+    connectionInfo.address
+  )
+
+  const content = (
+    <Fragment>
+      <span className="font-grotesk w-full truncate text-xs font-medium text-slate-500 capitalize">Address</span>
+      <span className="text-primary w-full truncate font-sans text-sm font-black capitalize">
+        {connectionInfo.address}
+      </span>
+    </Fragment>
+  )
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex w-full min-w-0 flex-col gap-12">
       <RequestModal />
 
       <div className="flex flex-col gap-4">
@@ -71,17 +83,22 @@ function RouteComponent() {
           </InfoBox>
 
           <Button
-            className="h-full min-w-0 shrink grow flex-col items-start gap-0 truncate rounded-xl px-4 py-2 max-md:col-span-5"
+            className={StyleHelper.merge(
+              'h-full min-w-0 shrink grow flex-col items-start gap-0 truncate rounded-xl px-4 py-2 max-md:col-span-5',
+              {
+                'pointer-events-none': !addressExplorerUrl,
+              }
+            )}
             variant="outline"
             asChild
           >
-            <Link to={replacedAddressExplorerUrl ?? '#'} target="_blank" rel="noopener noreferrer">
-              <p className="font-grotesk text-xs font-medium whitespace-nowrap text-slate-500 capitalize">Address</p>
-
-              <p className="text-primary w-full truncate font-sans text-sm font-black capitalize">
-                {connectionInfo.address}
-              </p>
-            </Link>
+            {addressExplorerUrl ? (
+              <Link to={addressExplorerUrl} target="_blank" rel="noopener noreferrer">
+                {content}
+              </Link>
+            ) : (
+              <span>{content}</span>
+            )}
           </Button>
 
           <Tooltip.Root>
@@ -116,20 +133,19 @@ function RouteComponent() {
         </div>
 
         {connectionInfo.walletInfo.name && connectionInfo.walletInfo.icon && (
-          <div className="flex items-center gap-4 rounded-2xl border border-white/5 px-4 py-3 backdrop-blur-xs">
+          <div className="flex items-center gap-4 rounded-2xl border border-white/5 px-4 py-3 backdrop-blur-xs max-sm:flex-col">
             <img
               src={connectionInfo.walletInfo.icon}
               alt={connectionInfo.walletInfo.name}
-              className="size-8 rounded-lg object-contain"
+              className="pointer-events-none size-8 rounded-lg object-contain"
             />
 
-            <p className="font-sans text-sm font-black text-white capitalize">{connectionInfo.walletInfo.name}</p>
+            <p className="text-left font-sans text-sm font-black text-white capitalize max-sm:text-center">
+              {connectionInfo.walletInfo.name}
+            </p>
 
             {connectionInfo.walletInfo.description && (
-              <Fragment>
-                <div className="h-full w-px bg-white/5" />
-                <p className="font-sans text-sm text-slate-400">{connectionInfo.walletInfo.description}</p>
-              </Fragment>
+              <p className="text-left font-sans text-sm text-slate-400">{connectionInfo.walletInfo.description}</p>
             )}
           </div>
         )}
@@ -137,19 +153,23 @@ function RouteComponent() {
 
       <div className="flex flex-col gap-12">
         <Tabs.Root defaultValue="methods">
-          <div className="flex items-center justify-between gap-4 border-b border-white/5 pb-2">
-            <h2 className="font-sans text-base font-bold text-slate-400">Test Methods</h2>
+          <div className="flex items-center justify-between gap-4 border-b border-white/5 pb-2 max-sm:flex-col max-sm:items-start max-sm:justify-start">
+            <h2 className="font-sans text-base font-bold text-slate-400">Methods</h2>
 
-            <Tabs.List>
-              <Tabs.Trigger value="methods">
-                <Send aria-hidden />
-                Methods
-              </Tabs.Trigger>
-              <Tabs.Trigger value="custom">
-                <Command aria-hidden />
-                Custom
-              </Tabs.Trigger>
-            </Tabs.List>
+            <div className="flex items-center justify-end gap-2 max-sm:flex-col max-sm:items-start max-sm:justify-start">
+              <Tabs.List>
+                <Tabs.Trigger value="methods">
+                  <Send aria-hidden />
+                  Methods
+                </Tabs.Trigger>
+                <Tabs.Trigger value="custom">
+                  <Command aria-hidden />
+                  Custom
+                </Tabs.Trigger>
+              </Tabs.List>
+
+              {connectionInfo.chain === 'neox' && <NeoxRpcToggle />}
+            </div>
           </div>
 
           <Tabs.Content value="methods">

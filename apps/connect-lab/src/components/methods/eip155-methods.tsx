@@ -604,7 +604,7 @@ export function EIP155Methods() {
 
       if (balance <= 0) {
         throw new Error(
-          'You need to have some USDC in your account to send a transaction using the Contract instance. Faucet here: https://faucet.circle.com/'
+          'You need to have some USDC in your account to send a transaction using the Contract instance. Faucet here: https://faucet.circle.com.'
         )
       }
 
@@ -714,7 +714,7 @@ export function EIP155Methods() {
         <li className="h-full">
           <MethodCard
             name="eth_sendTransaction (Contract)"
-            description="Same as eth_sendTransaction but using a Contract instance to send the transaction. This method will broadcast the transaction and return the transaction hash. It will call USDC contract so you will need to have some in your account. Faucet here: https://faucet.circle.com/"
+            description="Same as eth_sendTransaction but using a Contract instance to send the transaction. This method will broadcast the transaction and return the transaction hash. It will call USDC contract so you will need to have some in your account. Faucet here: https://faucet.circle.com."
             docUrl="https://wagmi.sh/core/api/actions/writeContract"
             onPlay={sendSendContractTransaction}
           />

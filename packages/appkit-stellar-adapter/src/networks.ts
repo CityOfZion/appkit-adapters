@@ -9,15 +9,12 @@ export const stellarMainnetNetwork: AppKitNetwork = {
 
   // @ts-expect-error AppKit does not stellar namespace included in ChainNamespace
   chainNamespace: "stellar",
-
   nativeCurrency: StellarConstants.XLM_TOKEN,
-
   rpcUrls: {
     default: {
       http: ["https://soroban-rpc.mainnet.stellar.gateway.fm"],
     },
   },
-
   name: "Stellar Mainnet",
 };
 
@@ -29,16 +26,12 @@ export const stellarTestnetNetwork: AppKitNetwork = {
 
   // @ts-expect-error AppKit does not stellar namespace included in ChainNamespace
   chainNamespace: "stellar",
-
   nativeCurrency: StellarConstants.XLM_TOKEN,
-
   rpcUrls: {
     default: {
-      http: ["https://soroban-rpc.testnet.stellar.gateway.fm"],
+      http: ["https://soroban-testnet.stellar.org"],
     },
   },
-
   name: "Stellar Testnet",
-
   testnet: true,
 };

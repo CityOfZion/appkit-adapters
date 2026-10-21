@@ -1,8 +1,8 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-25
-version: 0.2
+last_updated: 2026-10-19
+version: 0.3
 ---
 
 # Quickstart — React + AppKit base pattern
@@ -43,11 +43,11 @@ createAppKit({
 
 ### Getting the chain provider
 
-```ts
+```tsx
 import { useAppKitProvider } from '@reown/appkit/react'
 import type { Neo3Provider } from '@cityofzion/appkit-neo3-adapter'
 
-function Neo3Debug() {
+export function Neo3Debug() {
   // @ts-expect-error ChainNamespace does not yet include neo3
   const { walletProvider } = useAppKitProvider<Neo3Provider>('neo3')
   return <pre>{walletProvider ? 'neo3 provider ready' : 'no provider'}</pre>
@@ -61,9 +61,33 @@ Use the same pattern with:
 - `stellarMainnetNetwork` / `stellarTestnetNetwork`
 - `StellarConstants.OVERRIDES`
 
-### NeoX
+### Bitcoin
 
-NeoX is wired as EVM support through wagmi:
-- use `WagmiAdapter`
-- use NeoX networks from `@cityofzion/appkit-neox-adapter`
-- do not expect a separate NeoX adapter object in `adapters`
+Use the same pattern with:
+- `BitcoinAdapter`
+- `bitcoinMainnetNetwork` / `bitcoinTestnetNetwork`
+- `BitcoinConstants.OVERRIDES`
+- `useAppKitProvider<BitcoinProvider>('bip122')` — `bip122` is a native AppKit namespace, so no `@ts-expect-error`
+
+```tsx
+import { useAppKitProvider } from '@reown/appkit/react'
+import type { BitcoinProvider } from '@cityofzion/appkit-bitcoin-adapter'
+
+export function BitcoinDebug() {
+  const { walletProvider } = useAppKitProvider<BitcoinProvider>('bip122')
+  return <pre>{walletProvider ? 'bip122 provider ready' : 'no provider'}</pre>
+}
+```
+
+Do not also register `@reown/appkit-adapter-bitcoin`; both claim the `bip122` namespace.
+
+### Neo X
+
+Neo X is wired as EVM support through wagmi:
+- use `new WagmiAdapter({ projectId, networks })` from `@reown/appkit-adapter-wagmi`
+- use Neo X networks from `@cityofzion/appkit-neox-adapter`
+- do not expect a separate Neo X adapter object in `adapters`
+
+### Several chains at once
+
+Register all adapters and networks in one `createAppKit` call and merge the overrides of the non-EVM adapters into one `universalProviderConfigOverride` (see [REF__universal_provider_overrides.md](../reference/REF__universal_provider_overrides.md) and `examples/simple-app/`).

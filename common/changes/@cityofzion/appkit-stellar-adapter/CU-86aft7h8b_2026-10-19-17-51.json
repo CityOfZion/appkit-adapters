@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cityofzion/appkit-stellar-adapter",
+      "comment": "Fix errors",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cityofzion/appkit-stellar-adapter"
+}

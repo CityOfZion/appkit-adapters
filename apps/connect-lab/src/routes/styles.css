@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 @import 'tailwindcss';
@@ -7,11 +5,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 @theme {
-  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-grotesk: "Space Grotesk", system-ui, sans-serif;
-  --font-mono: "Space Mono", monospace;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-grotesk: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'Space Mono', monospace;
 }
 
 @keyframes shimmer {
@@ -43,7 +40,6 @@
 }
 
 @keyframes energy-resonate {
-
   0%,
   100% {
     transform: scale(1);
@@ -62,7 +58,6 @@
   animation: energy-resonate 2s ease-in-out infinite;
 }
 
-
 @keyframes orbit {
   from {
     transform: rotate(0deg) translateX(20px) rotate(0deg);
@@ -80,15 +75,14 @@
 body {
   @apply m-0 h-screen w-screen overflow-auto;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 :root {
@@ -208,13 +202,12 @@ code {
 
   body {
     @apply bg-background text-foreground;
-    /* Fix a chrome banding issue when using oklch colors */
-    background-image: linear-gradient(transparent, transparent);
 
+    background-image: linear-gradient(transparent, transparent);
   }
 
   #app {
-    @apply flex min-h-screen flex-col font-sans overflow-y-auto overflow-x-hidden h-screen w-screen items-center;
+    @apply flex h-screen min-h-screen w-screen flex-col items-center overflow-x-hidden overflow-y-auto font-sans;
   }
 }
 

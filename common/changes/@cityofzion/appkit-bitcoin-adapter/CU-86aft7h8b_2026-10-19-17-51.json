@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cityofzion/appkit-bitcoin-adapter",
+      "comment": "Init adapter",
+      "type": "none"
+    }
+  ],
+  "packageName": "@cityofzion/appkit-bitcoin-adapter"
+}

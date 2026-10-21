@@ -1,7 +1,7 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-04
+last_updated: 2026-10-19
 version: 0.1
 ---
 
@@ -44,6 +44,9 @@ Organized as: **symptom → likely cause → fixes / checks**.
 - Confirm adapter-specific required overrides are set:
   - Neo3: `universalProviderConfigOverride: Neo3Constants.OVERRIDES`
   - Stellar: `universalProviderConfigOverride: StellarConstants.OVERRIDES`
+  - Bitcoin: `universalProviderConfigOverride: BitcoinConstants.OVERRIDES`
+  - Several chains: one merged override object containing all of them
+- Bitcoin: make sure `@reown/appkit-adapter-bitcoin` is not registered next to `BitcoinAdapter` (both claim `bip122`), and use a WalletConnect wallet that supports Bitcoin (e.g. NEON Wallet); browser extension wallets are not offered by `BitcoinAdapter`.
 - Add a connection timeout + surface actionable error to the user.
 - Log structured connection events (start/success/failure + error category).
 
@@ -73,6 +76,8 @@ Organized as: **symptom → likely cause → fixes / checks**.
 - Ensure you read account/provider from AppKit’s state/hooks (per your integration pattern).
 - For EVM, validate a simple call (e.g., `eth_chainId`) immediately after connect.
 - For Neo3/Stellar, validate a safe read immediately after connect.
+- For Bitcoin, read the provider with `useAppKitProvider<BitcoinProvider>('bip122')` and call `getAccountAddresses()`.
+- For NeoX, pass `wagmiAdapter.wagmiConfig` to `@wagmi/core` / `@cityofzion/appkit-neox-adapter` actions; `useConfig()` from `wagmi` needs a `WagmiProvider`.
 
 ## Minimum telemetry to add
 - connect_start

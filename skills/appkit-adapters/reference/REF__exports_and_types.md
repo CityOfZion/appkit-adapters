@@ -1,27 +1,47 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-04
-version: 0.1
+last_updated: 2026-10-19
+version: 0.3
 ---
 
-# Reference: exports & types (high-level)
+# Reference: exports & types
 
-This library intentionally keeps reference-level docs high-level; agents should confirm exact exports against installed package versions.
+Public exports of each package (all from the package root; none of the packages define subpath exports).
 
 ## `@cityofzion/appkit-neo3-adapter`
-Likely exports (per README):
-- `Neo3Adapter`
-- `Neo3Constants`
+- `Neo3Adapter` (extends AppKit `AdapterBlueprint`)
+- `Neo3Connector`
+- `Neo3Constants` — `OVERRIDES`, `METHODS`, `EVENTS`, `GAS_TOKEN`
 - `neo3MainnetNetwork`, `neo3TestnetNetwork`
-- types like `Neo3Provider`
+- `ProviderEventEmitter`
+- type `Neo3Provider` (= `Neo3Connector`)
+
+Details: [ADAPTER__neo3.md](./ADAPTER__neo3.md)
 
 ## `@cityofzion/appkit-stellar-adapter`
-- `StellarAdapter`
-- `StellarConstants`
+- `StellarAdapter` (extends `AdapterBlueprint`)
+- `StellarConnector`
+- `StellarConstants` — `OVERRIDES`, `METHODS`, `EVENTS`, `XLM_TOKEN`, `HORIZON_URL_BY_ID`
 - `stellarMainnetNetwork`, `stellarTestnetNetwork`
-- types like `StellarProvider`
+- type `StellarProvider` (= `StellarConnector`)
+
+Details: [ADAPTER__stellar.md](./ADAPTER__stellar.md)
+
+## `@cityofzion/appkit-bitcoin-adapter`
+- `BitcoinAdapter` (extends `AdapterBlueprint`)
+- `BitcoinConnector` and its `TBitcoinConnector*` param/response types
+- `BitcoinConstants` — `OVERRIDES`, `METHODS`, `EVENTS`, `MAINNET_CHAIN_ID`, `TESTNET_CHAIN_ID`, `MEMPOOL_API_URL_BY_ID`, `BTC_TOKEN`
+- `bitcoinMainnetNetwork`, `bitcoinTestnetNetwork`
+- type `BitcoinProvider` (= `BitcoinConnector`)
+
+Details: [ADAPTER__bitcoin.md](./ADAPTER__bitcoin.md)
 
 ## `@cityofzion/appkit-neox-adapter`
-- `neoX*Network` definitions
-- `sendTransaction(config, params)` helper for anti-MEV support
+Not an `AdapterBlueprint`; used with `WagmiAdapter`.
+- Networks: `neoXMainnetNetwork`, `neoXTestnetNetwork`, `neoXAntiMevMainnetNetwork`, `neoXAntiMevTestnetNetwork`
+- Actions: `sendTransaction(wagmiConfig, params)`, `signTransaction(wagmiConfig, params)`, `buildAntiMevTransaction(wagmiConfig, params)`, `getCachedTransaction(wagmiConfig, params)`, `isAntiMevNetwork(network)`
+- Type: `GetCachedTransactionParameters`
+- ABIs: `governanceAbi`, `keyManagementAbi`
+
+Details: [ADAPTER__neox.md](./ADAPTER__neox.md)

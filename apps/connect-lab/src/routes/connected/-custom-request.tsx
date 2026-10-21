@@ -93,7 +93,7 @@ export function CustomRequest() {
 
       return await walletProvider.request({
         method,
-        params: params,
+        params: !params ? [] : params,
       })
     })
   }
@@ -106,7 +106,7 @@ export function CustomRequest() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="justi flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <Label>Parameters</Label>
 
           <ImportJsonModal onConfirm={handleImportJson}>

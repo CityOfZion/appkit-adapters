@@ -1,2 +1,12 @@
 patchedDependencies:
   '@reown/appkit': patches/@reown__appkit.patch
+
+ignoredBuiltDependencies:
+  - '@reown/appkit'
+  - bigint-buffer
+  - bufferutil
+  - unrs-resolver
+  - utf-8-validate
+
+onlyBuiltDependencies:
+  - esbuild
