@@ -10,9 +10,11 @@ import { useConnection } from '@/hooks/use-connection'
 
 export function Neo3Methods() {
   const { request } = useRequest()
+
   const {
     connectionInfo: { address, namespace },
   } = useConnection<true>()
+
   const { walletProvider } = useAppKitProvider<Neo3Provider>(namespace)
 
   function sendInvokeFunction() {
@@ -162,7 +164,7 @@ export function Neo3Methods() {
   }
 
   function sendDecryptFromArray() {
-    request('decrypt', async () => {
+    request('decryptFromArray', async () => {
       const [encryptedMessage] = await walletProvider.encrypt('My secret message')
 
       const [encryptedMessage2] = await walletProvider.encrypt('My second secret message')

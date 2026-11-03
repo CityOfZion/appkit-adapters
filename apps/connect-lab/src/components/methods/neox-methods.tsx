@@ -1,7 +1,12 @@
 import { parseEther } from 'viem'
 import { call, signMessage, signTypedData } from '@wagmi/core'
 import { Fragment } from 'react'
-import { isAntiMevNetwork, sendTransaction, signTransaction } from '@cityofzion/appkit-neox-adapter'
+import {
+  sendAntiMevTransaction,
+  sendTransaction,
+  signAntiMevTransaction,
+  signTransaction,
+} from '@cityofzion/appkit-neox-adapter'
 import type { Hex } from 'viem'
 import { MethodCard } from '@/components/method-card'
 import { useRequest } from '@/hooks/use-request'
@@ -10,17 +15,27 @@ import { AppKitHelper } from '@/helpers/appkit'
 
 export function NeoxMethods() {
   const { request } = useRequest()
-  const {
-    connectionInfo: { address, networkId, activeCaipNetwork },
-  } = useConnection<true>()
 
-  const isAntiMev = isAntiMevNetwork(activeCaipNetwork)
+  const {
+    connectionInfo: { address, networkId },
+  } = useConnection<true>()
 
   function sendSendTransaction() {
     request(
       'eth_sendTransaction',
       async () =>
         await sendTransaction(AppKitHelper.eip155Adapter.wagmiConfig, {
+          to: address as Hex,
+          value: parseEther('0.000001'),
+        })
+    )
+  }
+
+  function sendSendAntiMevTransaction() {
+    request(
+      'eth_sendTransaction',
+      async () =>
+        await sendAntiMevTransaction(AppKitHelper.eip155Adapter.wagmiConfig, {
           to: address as Hex,
           value: parseEther('0.000001'),
         })
@@ -43,6 +58,17 @@ export function NeoxMethods() {
       'eth_signTransaction',
       async () =>
         await signTransaction(AppKitHelper.eip155Adapter.wagmiConfig, {
+          to: address as Hex,
+          value: parseEther('0.000001'),
+        })
+    )
+  }
+
+  function sendSignAntiMevTransaction() {
+    request(
+      'eth_signTransaction',
+      async () =>
+        await signAntiMevTransaction(AppKitHelper.eip155Adapter.wagmiConfig, {
           to: address as Hex,
           value: parseEther('0.000001'),
         })
@@ -95,7 +121,7 @@ export function NeoxMethods() {
 
   function sendSignMessage() {
     request(
-      'signMessage',
+      'eth_signMessage',
       async () =>
         await signMessage(AppKitHelper.eip155Adapter.wagmiConfig, {
           message: `Hello, ${address}`,
@@ -107,18 +133,19 @@ export function NeoxMethods() {
     <Fragment>
       <li className="h-full">
         <MethodCard
-          name={isAntiMev ? 'eth_sendTransaction (Anti-MEV)' : 'eth_sendTransaction'}
-          description={
-            isAntiMev
-              ? 'Sends a transaction to the network using Anti-MEV. It will requests more than one signature request to the wallet.'
-              : 'Sends a transaction to the network. This method will broadcast the transaction and return the transaction hash.'
-          }
-          docUrl={
-            isAntiMev
-              ? 'https://xdocs.ngd.network/security/anti-mev-protection'
-              : 'https://wagmi.sh/core/api/actions/sendTransaction'
-          }
+          name="eth_sendTransaction"
+          description="Sends a transaction to the network. This method will broadcast the transaction and return the transaction hash."
+          docUrl="https://wagmi.sh/core/api/actions/sendTransaction"
           onPlay={sendSendTransaction}
+        />
+      </li>
+
+      <li className="h-full">
+        <MethodCard
+          name="eth_sendTransaction (Anti-MEV)"
+          description="Sends a transaction to the network using Anti-MEV. It requests multiple signatures from the wallet."
+          docUrl="https://xdocs.ngd.network/security/anti-mev-protection"
+          onPlay={sendSendAntiMevTransaction}
         />
       </li>
 
@@ -133,14 +160,19 @@ export function NeoxMethods() {
 
       <li className="h-full">
         <MethodCard
-          name={isAntiMev ? 'eth_signTransaction (Anti-MEV)' : 'eth_signTransaction'}
-          description={
-            isAntiMev
-              ? 'Signs a transaction using Anti-MEV. It will requests more than one signature request to the wallet. This method will return the signed transaction data that can be broadcasted to the network.'
-              : 'Signs a transaction. This method will return the signed transaction data that can be broadcasted to the network.'
-          }
+          name="eth_signTransaction"
+          description="Signs a transaction. This method will return the signed transaction data that can be broadcasted to the network."
           docUrl="https://wagmi.sh/core/api/actions/signTransaction"
           onPlay={sendSignTransaction}
+        />
+      </li>
+
+      <li className="h-full">
+        <MethodCard
+          name="eth_signTransaction (Anti-MEV)"
+          description="Signs a transaction using Anti-MEV. It requests multiple signatures from the wallet. This method will return the signed transaction data that can be broadcasted to the network."
+          docUrl="https://xdocs.ngd.network/security/anti-mev-protection"
+          onPlay={sendSignAntiMevTransaction}
         />
       </li>
 

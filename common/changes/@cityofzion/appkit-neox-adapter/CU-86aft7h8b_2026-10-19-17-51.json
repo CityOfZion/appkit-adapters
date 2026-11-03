@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cityofzion/appkit-neox-adapter",
+      "comment": "Fix errors",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cityofzion/appkit-neox-adapter"
+}

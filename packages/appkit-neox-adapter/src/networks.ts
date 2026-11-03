@@ -33,7 +33,6 @@ export const neoXAntiMevMainnetNetwork: AppKitNetwork = {
 
 export const neoXAntiMevTestnetNetwork: AppKitNetwork = {
   ...neoXTestnetNetwork,
-
   rpcUrls: {
     default: {
       http: ["https://neoxt4seed5.ngd.network"],

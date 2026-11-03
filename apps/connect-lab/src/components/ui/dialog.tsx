@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { Dialog as DialogPrimitive } from 'radix-ui'
 import { X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -63,7 +63,7 @@ function Body({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="dialog-body"
-      className={StyleHelper.merge('flex w-full flex-col gap-4 p-10', className)}
+      className={StyleHelper.merge('flex w-full flex-col gap-4 p-10 max-sm:p-4', className)}
       {...props}
     />
   )
@@ -74,7 +74,7 @@ function Header({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="dialog-header"
       className={StyleHelper.merge(
-        'relative flex flex-col gap-2 border-b border-slate-700/50 bg-slate-950/20 p-10',
+        'relative flex flex-col gap-3 border-b border-slate-700/50 bg-slate-950/20 p-10 max-sm:p-4',
         className
       )}
       {...props}

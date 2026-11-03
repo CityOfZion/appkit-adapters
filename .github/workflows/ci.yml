@@ -1,14 +1,14 @@
 name: CI
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2
       - name: Git config user
@@ -16,12 +16,27 @@ jobs:
         with:
           name: github-actions
           email: github-actions@github.com
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10
       - name: Verify Change Logs
         run: node common/scripts/install-run-rush.js change --verify
-      - name: Rush Install
+      - name: Rush install
         run: node common/scripts/install-run-rush.js install
+      - name: Rush lint
+        run: node common/scripts/install-run-rush.js lint
       - name: Rush rebuild
         run: node common/scripts/install-run-rush.js rebuild --verbose
+      - name: Install Connect Lab dependencies
+        working-directory: apps/connect-lab
+        run: pnpm install --frozen-lockfile
+      - name: Lint Connect Lab
+        working-directory: apps/connect-lab
+        run: pnpm run lint
+      - name: Build Connect Lab
+        working-directory: apps/connect-lab
+        run: pnpm run build

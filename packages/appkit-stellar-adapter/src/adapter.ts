@@ -262,11 +262,12 @@ export class StellarAdapter extends AdapterBlueprint {
     );
 
     const balance = xlmBalanceObj ? xlmBalanceObj.balance : "0";
+    const decimals = StellarConstants.XLM_TOKEN.decimals;
 
     return {
       balance: this.formatUnits({
-        value: balance,
-        decimals: StellarConstants.XLM_TOKEN.decimals,
+        value: this.parseUnits({ value: balance, decimals }),
+        decimals,
       }),
       symbol: StellarConstants.XLM_TOKEN.symbol,
     };
@@ -323,7 +324,7 @@ export class StellarAdapter extends AdapterBlueprint {
   }
 
   public override writeSolanaTransaction(): Promise<AdapterBlueprint.WriteSolanaTransactionResult> {
-    throw new Error("StellarAdapter:writeContract - Not supported.");
+    throw new Error("StellarAdapter:writeSolanaTransaction - Not supported.");
   }
 
   public override signMessage(
@@ -360,11 +361,5 @@ export class StellarAdapter extends AdapterBlueprint {
 
   public override revokePermissions(): Promise<`0x${string}`> {
     throw new Error("StellarAdapter:revokePermissions - Not supported.");
-  }
-
-  public override switchNetwork(
-    _params: AdapterBlueprint.SwitchNetworkParams,
-  ): Promise<any> {
-    throw new Error("StellarAdapter:switchNetwork - Not supported.");
   }
 }

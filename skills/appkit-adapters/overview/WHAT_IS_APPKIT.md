@@ -1,7 +1,7 @@
 ---
 status: draft
 owner: Trinity
-last_updated: 2026-03-04
+last_updated: 2026-10-19
 version: 0.1
 ---
 
@@ -28,8 +28,9 @@ import { AppKitProvider } from '@reown/appkit/react'
 You use them to:
 - add **Neo3** support to an AppKit-based dApp (`@cityofzion/appkit-neo3-adapter`)
 - add **Stellar** support (`@cityofzion/appkit-stellar-adapter`)
-- add **NeoX** network configs + anti-MEV transaction helpers for EVM (`@cityofzion/appkit-neox-adapter`) while still using the standard `WagmiAdapter`
+- add **Bitcoin** support through WalletConnect wallets such as NEON Wallet (`@cityofzion/appkit-bitcoin-adapter`, native `bip122` namespace; use it instead of `@reown/appkit-adapter-bitcoin`, never both)
+- add **Neo X** network configs + anti-MEV transaction helpers for EVM (`@cityofzion/appkit-neox-adapter`) while still using the standard `WagmiAdapter`
 
-Key gotcha: Neo3 + Stellar require `universalProviderConfigOverride` (AppKit defaults don’t include those RPC methods).
+Key gotcha: Neo3 + Stellar require `universalProviderConfigOverride` (AppKit defaults don't include those RPC methods). Bitcoin's methods are requested by AppKit already, but `BitcoinConstants.OVERRIDES` also registers the `bip122_addressesChanged` event. With several adapters, merge the overrides into one object (see [REF__universal_provider_overrides.md](../reference/REF__universal_provider_overrides.md)).
 
 See also: upstream connect-lab demo https://cityofzion.github.io/appkit-adapters/

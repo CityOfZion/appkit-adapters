@@ -5,6 +5,7 @@ import {
   type Provider,
   type RequestArguments,
 } from "@reown/appkit-controllers";
+import type UniversalProvider from "@walletconnect/universal-provider";
 
 import type {
   InvokeResult,
@@ -17,8 +18,7 @@ import type {
   ContractInvocationMulti,
 } from "@cityofzion/neon-dappkit-types";
 import { ProviderEventEmitter } from "./emitter.js";
-import type { SessionTypes } from "@walletconnect/types";
-import type { CaipNetwork } from "@reown/appkit";
+import type { CaipNetwork } from "@reown/appkit-common";
 
 type WalletInfo = {
   isLedger: boolean;
@@ -32,7 +32,7 @@ export class Neo3Connector extends WalletConnectConnector implements Provider {
     this.eventEmitter,
   );
 
-  public get session(): SessionTypes.Struct | undefined {
+  public get session(): UniversalProvider["session"] {
     return this.provider.session;
   }
 
@@ -109,14 +109,14 @@ export class Neo3Connector extends WalletConnectConnector implements Provider {
    *   }
    * ]
    *
-   * const signer: Signer[] = [
+   * const signers: Signer[] = [
    *   {
    *     scopes: 'Global'
    *   }
    * ]
    *
    * const formattedRequest: ContractInvocationMulti = {
-   *   signer,
+   *   signers,
    *   invocations
    * }
    * const resp = await invokeFunction(formattedRequest)
@@ -222,14 +222,18 @@ export class Neo3Connector extends WalletConnectConnector implements Provider {
   ): Promise<EncryptedPayload[]> {
     const resp = await this.request({
       method: "encrypt",
-      params: [message, publicKeys].filter(Boolean),
+      params: publicKeys ? [message, publicKeys] : [message],
     });
     return resp as EncryptedPayload[];
   }
 
   async decrypt(payload: EncryptedPayload): Promise<string> {
-    const resp = await this.request({ method: "encrypt", params: [payload] });
-    return resp as string;
+    const response = await this.request({
+      method: "decrypt",
+      params: [payload],
+    });
+
+    return response as string;
   }
 
   async decryptFromArray(

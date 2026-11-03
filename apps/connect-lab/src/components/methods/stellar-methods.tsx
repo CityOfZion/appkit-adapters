@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import { useAppKitProvider } from '@reown/appkit/react'
 import { Fragment } from 'react'
 import * as stellarSDK from '@stellar/stellar-sdk'
@@ -8,48 +9,49 @@ import { useConnection } from '@/hooks/use-connection'
 
 export function StellarMethods() {
   const { request } = useRequest()
+
   const {
     connectionInfo: { address, activeCaipNetwork, namespace },
   } = useConnection<true>()
+
   const { walletProvider } = useAppKitProvider<StellarProvider>(namespace)
 
-  function sendSignTransaction() {
-    request('signTransaction', async () => {
-      const account = new stellarSDK.Account(address, '-1')
-      const tx = new stellarSDK.TransactionBuilder(account, {
-        fee: stellarSDK.BASE_FEE,
-        networkPassphrase: activeCaipNetwork.id === 'pubnet' ? stellarSDK.Networks.PUBLIC : stellarSDK.Networks.TESTNET,
-      })
-        .setTimeout(0)
-        .addOperation(
-          stellarSDK.Operation.manageData({
-            name: 'Hello',
-            value: address,
-          })
-        )
-        .build()
+  const networkPassphrase = activeCaipNetwork.id === 'pubnet' ? stellarSDK.Networks.PUBLIC : stellarSDK.Networks.TESTNET
 
-      return await walletProvider.signTransaction(tx.toXDR())
+  function getServer() {
+    return new stellarSDK.rpc.Server(activeCaipNetwork.rpcUrls.default.http[0])
+  }
+
+  function getAccount() {
+    return new stellarSDK.Account(address, '-1')
+  }
+
+  function buildTransactionXDR(account: stellarSDK.Account = getAccount()) {
+    const tx = new stellarSDK.TransactionBuilder(account, {
+      fee: stellarSDK.BASE_FEE,
+      networkPassphrase,
     })
+      .setTimeout(0)
+      .addOperation(
+        stellarSDK.Operation.manageData({
+          name: 'Hello',
+          value: address,
+        })
+      )
+      .build()
+
+    return tx.toXDR()
+  }
+
+  function sendSignTransaction() {
+    request('signTransaction', async () => walletProvider.signTransaction(buildTransactionXDR()))
   }
 
   function sendSignAndSubmitTransaction() {
     request('signAndSubmitTransaction', async () => {
-      const account = new stellarSDK.Account(address, '-1')
-      const tx = new stellarSDK.TransactionBuilder(account, {
-        fee: stellarSDK.BASE_FEE,
-        networkPassphrase: activeCaipNetwork.id === 'pubnet' ? stellarSDK.Networks.PUBLIC : stellarSDK.Networks.TESTNET,
-      })
-        .setTimeout(0)
-        .addOperation(
-          stellarSDK.Operation.manageData({
-            name: 'Hello',
-            value: address,
-          })
-        )
-        .build()
+      const account = await getServer().getAccount(address)
 
-      return await walletProvider.signAndSubmitTransaction(tx.toXDR())
+      return walletProvider.signAndSubmitTransaction(buildTransactionXDR(account))
     })
   }
 
@@ -59,17 +61,13 @@ export function StellarMethods() {
 
   function sendSignAuthEntry() {
     request('signAuthEntry', async () => {
-      const networkUrl = activeCaipNetwork.rpcUrls.default.http[0]
-
-      const server = new stellarSDK.rpc.Server(networkUrl)
+      const server = getServer()
 
       const contract = new stellarSDK.Contract(
         activeCaipNetwork.id === 'pubnet'
           ? 'CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA'
           : 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC'
       )
-
-      const account = await server.getAccount(address)
 
       const operation = contract.call(
         'transfer',
@@ -78,9 +76,9 @@ export function StellarMethods() {
         stellarSDK.nativeToScVal(1000000, { type: 'i128' }) // amount
       )
 
-      const transaction = new stellarSDK.TransactionBuilder(account, {
+      const transaction = new stellarSDK.TransactionBuilder(getAccount(), {
         fee: stellarSDK.BASE_FEE,
-        networkPassphrase: stellarSDK.Networks.TESTNET,
+        networkPassphrase,
       })
         .addOperation(operation)
         .setTimeout(30)
@@ -97,29 +95,19 @@ export function StellarMethods() {
       }
 
       const authEntry = simulated.result.auth[0]
-
-      const networkPassphrase =
-        activeCaipNetwork.id === 'pubnet' ? stellarSDK.Networks.PUBLIC : stellarSDK.Networks.TESTNET
-
       const latestLedger = await server.getLatestLedger()
-      const signatureExpirationLedger = latestLedger.sequence + 100
-
-      const nonce = stellarSDK.xdr.Int64.fromString(Math.floor(Math.random() * 1000000000).toString())
 
       const authPreimage = new stellarSDK.xdr.HashIdPreimageSorobanAuthorization({
         networkId: stellarSDK.hash(Buffer.from(networkPassphrase)),
-        nonce: nonce,
-        signatureExpirationLedger: signatureExpirationLedger,
+        nonce: stellarSDK.xdr.Int64.fromString(Math.floor(Math.random() * 1000000000).toString()),
+        signatureExpirationLedger: latestLedger.sequence + 100,
         invocation: authEntry.rootInvocation(),
       })
 
       const hashIdPreimage = stellarSDK.xdr.HashIdPreimage.envelopeTypeSorobanAuthorization(authPreimage)
-
       const preimageXDR = hashIdPreimage.toXDR('base64')
 
-      const response = await walletProvider.signAuthEntry(preimageXDR)
-
-      return response
+      return await walletProvider.signAuthEntry(preimageXDR)
     })
   }
 
@@ -133,7 +121,7 @@ export function StellarMethods() {
         <MethodCard
           name="signTransaction"
           description="Sign a transaction with the connected wallet."
-          docUrl="https://docs.freighter.app/docs/playground/signTransaction"
+          docUrl="https://docs.freighter.app/extension-freighter-api/signing#signtransaction"
           onPlay={sendSignTransaction}
         />
       </li>
@@ -142,7 +130,7 @@ export function StellarMethods() {
         <MethodCard
           name="signAndSubmitTransaction"
           description="Sign and broadcasting the transaction using the connected wallet"
-          docUrl="https://docs.freighter.app/docs/playground/signTransaction"
+          docUrl="https://docs.freighter.app/extension-freighter-api/signing#signtransaction"
           onPlay={sendSignAndSubmitTransaction}
         />
       </li>
@@ -151,7 +139,7 @@ export function StellarMethods() {
         <MethodCard
           name="signMessage"
           description="Sign a message with the connected wallet."
-          docUrl="https://docs.freighter.app/docs/playground/signmessage/"
+          docUrl="https://docs.freighter.app/extension-freighter-api/signing#signmessage"
           onPlay={sendSignMessage}
         />
       </li>
@@ -160,7 +148,7 @@ export function StellarMethods() {
         <MethodCard
           name="signAuthEntry"
           description="Sign an authentication entry with the connected wallet."
-          docUrl="https://docs.freighter.app/docs/playground/signAuthEntry"
+          docUrl="https://docs.freighter.app/extension-freighter-api/signing#signauthentry"
           onPlay={sendSignAuthEntry}
         />
       </li>
@@ -169,7 +157,7 @@ export function StellarMethods() {
         <MethodCard
           name="getNetwork"
           description="Get the current network the wallet is connected to."
-          docUrl="https://docs.freighter.app/docs/playground/getNetwork"
+          docUrl="https://docs.freighter.app/extension-freighter-api/reading-data#getnetwork"
           onPlay={sendGetNetwork}
         />
       </li>

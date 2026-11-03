@@ -4,7 +4,6 @@ import type { ChangeEvent, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import { Spinner } from '@/components/ui/spinner'
 
 type TProps = {
   children: ReactNode
@@ -14,7 +13,6 @@ type TProps = {
 export function ImportJsonModal({ children, onConfirm }: TProps) {
   const [json, setJson] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
@@ -29,14 +27,11 @@ export function ImportJsonModal({ children, onConfirm }: TProps) {
         return
       }
 
-      setLoading(true)
       onConfirm?.(json)
       setIsOpen(false)
       setJson('')
     } catch {
       setError('Invalid JSON. Please check your input and try again.')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -50,10 +45,6 @@ export function ImportJsonModal({ children, onConfirm }: TProps) {
 
           <div className="flex grow flex-col justify-center">
             <Dialog.Title className="text-2xl">Import JSON</Dialog.Title>
-
-            <p className="font-sans text-[10px] font-bold tracking-wider text-slate-500 uppercase">
-              {/* {requestState.method} */}
-            </p>
           </div>
 
           <Dialog.Close />
@@ -76,8 +67,8 @@ export function ImportJsonModal({ children, onConfirm }: TProps) {
             <p className="font-grotesk text-sm text-red-500">{error}</p>
           </div>
 
-          <Button onClick={handleConfirm} className="mt-5 h-12" disabled={loading || !json.length}>
-            {loading ? <Spinner className="size-4" /> : 'Import'}
+          <Button onClick={handleConfirm} className="mt-5 h-12" disabled={!json.length}>
+            Import
           </Button>
         </Dialog.Body>
       </Dialog.Content>

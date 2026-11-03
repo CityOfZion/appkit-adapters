@@ -1,4 +1,4 @@
-# Do not vendor dependencies or build artifacts in AKB examples
+# Do not vendor dependencies or build artifacts in skill examples
 node_modules/
 dist/
 .vite/
@@ -6,6 +6,7 @@ dist/
 # Env
 .env
 .env.*
+!.env.example
 
 # Logs
 npm-debug.log*
