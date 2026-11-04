@@ -4,13 +4,14 @@ import { ChainHelper } from '@/helpers/chain'
 import { useConnection } from '@/hooks/use-connection'
 import { AnimatedAppLogo } from '@/components/app-logo'
 import { Spinner } from '@/components/ui/spinner'
+import { StyleHelper } from '@/helpers/style'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
 function App() {
-  const { connect, connectionInfo } = useConnection()
+  const { selectChain, selectedChain, connectionInfo } = useConnection()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -63,8 +64,13 @@ function App() {
             return (
               <li key={chain}>
                 <button
-                  className="group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border border-white/5 px-5 py-3 shadow-lg transition-all duration-300 hover:scale-105"
-                  onClick={() => connect(chain)}
+                  className={StyleHelper.merge(
+                    'group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border border-white/5 px-5 py-3 shadow-lg transition-all duration-300 hover:scale-105 focus:scale-105',
+                    { 'border-white/30': chain === selectedChain }
+                  )}
+                  onClick={() => {
+                    if (selectChain(chain)) navigate({ to: '/connect' })
+                  }}
                 >
                   <div
                     className="absolute top-0 left-0 h-full w-full opacity-0 transition-all duration-300 group-hover:opacity-100"

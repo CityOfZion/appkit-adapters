@@ -12,7 +12,8 @@ import GithubIcon from '@/assets/icons/github-icon.svg?react'
 
 import './styles.css'
 
-AppKitHelper.setup()
+const storedChain = AppKitHelper.getStoredChain()
+if (storedChain) AppKitHelper.setup(storedChain)
 
 export const Route = createRootRoute({
   component: () => (

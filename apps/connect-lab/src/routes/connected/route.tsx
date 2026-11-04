@@ -39,11 +39,11 @@ const methodsComponentByChain: Record<TSupportedChain, ComponentType> = {
 }
 
 function RouteComponent() {
-  const { connectionInfo, disconnect } = useConnection()
+  const { connectionInfo, selectedChain, disconnect } = useConnection()
   const [isDisconnecting, startDisconnect] = useTransition()
 
   if (connectionInfo.status !== 'connected') {
-    return <Navigate to="/" />
+    return <Navigate to={selectedChain ? '/connect' : '/'} />
   }
 
   const MethodComponent = methodsComponentByChain[connectionInfo.chain]

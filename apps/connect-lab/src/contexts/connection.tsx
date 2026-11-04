@@ -7,6 +7,7 @@ import type { ChainNamespace } from '@reown/appkit/networks'
 import type { TSupportedChain } from '@/helpers/chain'
 import { ChainHelper } from '@/helpers/chain'
 import { UtilsHelper } from '@/helpers/utils'
+import { AppKitHelper } from '@/helpers/appkit'
 
 type TConnectingConnectionInfo = {
   status: 'connecting'
@@ -36,7 +37,10 @@ type TConnectionInfo = TConnectingConnectionInfo | TConnectedConnectionInfo | TN
 
 type TConnectionProviderState = {
   connectionInfo: TConnectionInfo
-  connect: (chain: TSupportedChain) => Promise<void>
+  selectedChain: TSupportedChain | undefined
+  /** Returns false when the page is reloading to boot AppKit with the new chain */
+  selectChain: (chain: TSupportedChain) => boolean
+  connect: () => Promise<void>
   disconnect: () => Promise<void>
 }
 
@@ -46,32 +50,88 @@ type ConnectionProviderProps = {
 
 export const ConnectionProviderContext = createContext<TConnectionProviderState | null>(null)
 
+// AppKit hooks throw until createAppKit is called, so AppKit is only created (with the selected chain) on demand.
+// The hooks live in a sibling component rendering `null`, so `children` keeps the same position in the tree and is
+// not remounted when AppKit gets initialized.
 export function ConnectionProvider({ children }: ConnectionProviderProps) {
+  const [selectedChain, setSelectedChain] = useState(AppKitHelper.initializedChain)
+  // AppKit booted with a stored chain, so it may be restoring a previous session
+  const [isRestoringSession] = useState(!!AppKitHelper.initializedChain)
+
+  const [connectionInfo, setConnectionInfo] = useState<TConnectionInfo>(
+    selectedChain ? { status: 'connecting' } : { status: 'not_connected', loading: false }
+  )
+
+  const actionsRef = useRef<TAppKitActions | null>(null)
+
+  function selectChain(chain: TSupportedChain) {
+    const isReady = AppKitHelper.setup(chain)
+    if (isReady) setSelectedChain(chain)
+    return isReady
+  }
+
+  async function connect() {
+    await actionsRef.current?.open()
+  }
+
+  async function disconnect() {
+    await actionsRef.current?.disconnect()
+  }
+
+  return (
+    <ConnectionProviderContext.Provider value={{ connectionInfo, selectedChain, selectChain, disconnect, connect }}>
+      {selectedChain && (
+        <AppKitConnectionSync
+          chain={selectedChain}
+          isRestoringSession={isRestoringSession}
+          actionsRef={actionsRef}
+          onChange={setConnectionInfo}
+        />
+      )}
+
+      {children}
+    </ConnectionProviderContext.Provider>
+  )
+}
+
+type TAppKitActions = {
+  open: () => Promise<void>
+  disconnect: () => Promise<void>
+}
+
+type AppKitConnectionSyncProps = {
+  chain: TSupportedChain
+  isRestoringSession: boolean
+  actionsRef: React.RefObject<TAppKitActions | null>
+  onChange: (connectionInfo: TConnectionInfo) => void
+}
+
+function AppKitConnectionSync({ chain, isRestoringSession, actionsRef, onChange }: AppKitConnectionSyncProps) {
   const appKitAccountState = useAppKitAccount()
   const { disconnect: appKitDisconnect } = useDisconnect()
   const { open } = useAppKit()
 
-  const isFirstRender = useRef(true)
-
-  const [connectionInfo, setConnectionInfo] = useState<TConnectionInfo>({
-    status: 'connecting',
-  })
+  // Only wait on first render when a previous session may be restored
+  const isFirstRender = useRef(isRestoringSession)
 
   async function disconnect() {
     await appKitDisconnect()
   }
 
-  async function connect(chain: TSupportedChain) {
-    const namespace = ChainHelper.chainInfos[chain].namespace
-    await open({ namespace })
+  async function openModal() {
+    await open({ namespace: ChainHelper.chainInfos[chain].namespace })
   }
+
+  useEffect(() => {
+    actionsRef.current = { open: openModal, disconnect }
+  })
 
   useEffect(() => {
     let isCancelled = false
 
     async function handle() {
       if (appKitAccountState.status === 'connecting' || appKitAccountState.status === 'reconnecting') {
-        setConnectionInfo({
+        onChange({
           status: 'connecting',
         })
 
@@ -88,7 +148,7 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
       if (isCancelled) return
 
       if (!appKitAccountState.caipAddress) {
-        setConnectionInfo({
+        onChange({
           status: 'not_connected',
           loading: false,
         })
@@ -96,21 +156,12 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
       }
 
       const [connectedNamespace, connectedNetworkId, connectedAddress] = appKitAccountState.caipAddress.split(':')
-      let connectedChain: TSupportedChain | undefined
-
-      for (const chain of ChainHelper.supportedChains) {
-        const networks = ChainHelper.chainInfos[chain].networks
-
-        const network = networks.find(
-          networkItem =>
-            networkItem.id.toString() === connectedNetworkId &&
-            CaipNetworksUtil.getChainNamespace(networkItem) === connectedNamespace
-        )
-        if (!network) continue
-
-        connectedChain = chain
-        break
-      }
+      const isConnectedToChain = ChainHelper.chainInfos[chain].networks.some(
+        networkItem =>
+          networkItem.id.toString() === connectedNetworkId &&
+          CaipNetworksUtil.getChainNamespace(networkItem) === connectedNamespace
+      )
+      const connectedChain = isConnectedToChain ? chain : undefined
 
       const activeCaipNetwork = ChainController.state.activeCaipNetwork
 
@@ -122,7 +173,7 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
       const walletInfo = ChainController.state.chains.get(connectedNamespace as ChainNamespace)?.accountState
         ?.connectedWalletInfo
 
-      setConnectionInfo({
+      onChange({
         status: 'connected',
         address: connectedAddress,
         networkId: connectedNetworkId,
@@ -145,9 +196,5 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
     }
   }, [appKitAccountState.caipAddress, appKitAccountState.status])
 
-  return (
-    <ConnectionProviderContext.Provider value={{ connectionInfo, disconnect, connect }}>
-      {children}
-    </ConnectionProviderContext.Provider>
-  )
+  return null
 }
