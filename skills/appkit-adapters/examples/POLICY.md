@@ -16,7 +16,7 @@ Define what we **guarantee** about examples under `examples/` and how they relat
 
 ## Adapter dependencies
 
-- Examples consume the CityOfZion adapters from this repo via `file:../../../../packages/<name>`, not from npm, so they always track the current source (including unpublished packages such as `@cityofzion/appkit-bitcoin-adapter`).
+- Examples consume the CityOfZion adapters from this repo via `file:../../../../packages/<name>`, not from npm, so they always track the current source.
 - Consequently, `rush install && rush build-packages` (repo root) is a prerequisite for installing or building any example; READMEs must say so.
 - Reown / third-party dependencies are pinned (e.g. `@reown/appkit@1.8.19`) and committed with a `pnpm-lock.yaml`.
 

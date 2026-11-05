@@ -13,6 +13,7 @@ import GithubIcon from '@/assets/icons/github-icon.svg?react'
 import './styles.css'
 
 const storedChain = AppKitHelper.getStoredChain()
+
 if (storedChain) AppKitHelper.setup(storedChain)
 
 export const Route = createRootRoute({
@@ -36,7 +37,7 @@ export const Route = createRootRoute({
               </Button>
 
               <Button variant="secondary" asChild>
-                <Link to={'https://coz.io/' as string} target="_blank" rel="noopener noreferrer">
+                <Link to={'https://coz.io' as string} target="_blank" rel="noopener noreferrer">
                   <COZ aria-hidden className="size-5" />
                   COZ
                 </Link>

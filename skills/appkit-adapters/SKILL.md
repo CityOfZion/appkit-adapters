@@ -158,7 +158,7 @@ Required details:
 
 ### Bitcoin
 
-Supported and validated in the multi-chain example. `@cityofzion/appkit-bitcoin-adapter` is not yet published to npm; use the local package build.
+Supported and validated in the multi-chain example.
 
 Required details:
 - `new BitcoinAdapter()` in `adapters`

@@ -21,7 +21,7 @@ version: 0.3
 | `@reown/appkit/react` | subpath export | `import { useAppKit } from '@reown/appkit/react'` | import path only, not a package |
 | `@cityofzion/appkit-neo3-adapter` | adapter package | `import { Neo3Adapter } from '@cityofzion/appkit-neo3-adapter'` | validated in both examples |
 | `@cityofzion/appkit-stellar-adapter` | adapter package | `import { StellarAdapter } from '@cityofzion/appkit-stellar-adapter'` | validated in `examples/simple-app` |
-| `@cityofzion/appkit-bitcoin-adapter` | adapter package | `import { BitcoinAdapter } from '@cityofzion/appkit-bitcoin-adapter'` | validated in `examples/simple-app`; not yet published to npm; replaces `@reown/appkit-adapter-bitcoin` (never use both) |
+| `@cityofzion/appkit-bitcoin-adapter` | adapter package | `import { BitcoinAdapter } from '@cityofzion/appkit-bitcoin-adapter'` | validated in `examples/simple-app`; replaces `@reown/appkit-adapter-bitcoin` (never use both) |
 | `@cityofzion/appkit-neox-adapter` | network/helper package | `import { neoXTestnetNetwork } from '@cityofzion/appkit-neox-adapter'` | used with `WagmiAdapter`, not an adapter object; root export only (no `/networks` subpath) |
 | `@reown/appkit-adapter-wagmi` | Reown EVM adapter | `import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'` | needed for Neo X |
 | `@reown/appkit-common` | required peer | normal package resolution | peer of every CityOfZion package |

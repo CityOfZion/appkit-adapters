@@ -2,6 +2,7 @@ import { useAppKit, useAppKitAccount, useDisconnect } from '@reown/appkit/react'
 import { createContext, useEffect, useRef, useState } from 'react'
 import { ChainController } from '@reown/appkit-controllers'
 import { CaipNetworksUtil } from '@reown/appkit-utils'
+import type { ReactNode } from 'react'
 import type { CaipNetwork } from '@reown/appkit/react'
 import type { ChainNamespace } from '@reown/appkit/networks'
 import type { TSupportedChain } from '@/helpers/chain'
@@ -38,14 +39,13 @@ type TConnectionInfo = TConnectingConnectionInfo | TConnectedConnectionInfo | TN
 type TConnectionProviderState = {
   connectionInfo: TConnectionInfo
   selectedChain: TSupportedChain | undefined
-  /** Returns false when the page is reloading to boot AppKit with the new chain */
-  selectChain: (chain: TSupportedChain) => boolean
+  selectChain: (chain: TSupportedChain | undefined) => void
   connect: () => Promise<void>
   disconnect: () => Promise<void>
 }
 
 type ConnectionProviderProps = {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export const ConnectionProviderContext = createContext<TConnectionProviderState | null>(null)
@@ -54,9 +54,10 @@ export const ConnectionProviderContext = createContext<TConnectionProviderState 
 // The hooks live in a sibling component rendering `null`, so `children` keeps the same position in the tree and is
 // not remounted when AppKit gets initialized.
 export function ConnectionProvider({ children }: ConnectionProviderProps) {
-  const [selectedChain, setSelectedChain] = useState(AppKitHelper.initializedChain)
+  const [selectedChain, setSelectedChain] = useState(AppKitHelper.chain)
+
   // AppKit booted with a stored chain, so it may be restoring a previous session
-  const [isRestoringSession] = useState(!!AppKitHelper.initializedChain)
+  const [isRestoringSession] = useState(!!selectedChain)
 
   const [connectionInfo, setConnectionInfo] = useState<TConnectionInfo>(
     selectedChain ? { status: 'connecting' } : { status: 'not_connected', loading: false }
@@ -64,10 +65,9 @@ export function ConnectionProvider({ children }: ConnectionProviderProps) {
 
   const actionsRef = useRef<TAppKitActions | null>(null)
 
-  function selectChain(chain: TSupportedChain) {
-    const isReady = AppKitHelper.setup(chain)
-    if (isReady) setSelectedChain(chain)
-    return isReady
+  function selectChain(chain: TSupportedChain | undefined) {
+    AppKitHelper.setup(chain)
+    setSelectedChain(chain)
   }
 
   async function connect() {
@@ -152,17 +152,19 @@ function AppKitConnectionSync({ chain, isRestoringSession, actionsRef, onChange 
           status: 'not_connected',
           loading: false,
         })
+
         return
       }
 
       const [connectedNamespace, connectedNetworkId, connectedAddress] = appKitAccountState.caipAddress.split(':')
+
       const isConnectedToChain = ChainHelper.chainInfos[chain].networks.some(
         networkItem =>
           networkItem.id.toString() === connectedNetworkId &&
           CaipNetworksUtil.getChainNamespace(networkItem) === connectedNamespace
       )
-      const connectedChain = isConnectedToChain ? chain : undefined
 
+      const connectedChain = isConnectedToChain ? chain : undefined
       const activeCaipNetwork = ChainController.state.activeCaipNetwork
 
       if (!connectedChain || !activeCaipNetwork) {
@@ -189,7 +191,7 @@ function AppKitConnectionSync({ chain, isRestoringSession, actionsRef, onChange 
       })
     }
 
-    handle()
+    void handle()
 
     return () => {
       isCancelled = true

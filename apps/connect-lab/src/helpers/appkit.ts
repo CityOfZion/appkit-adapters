@@ -21,12 +21,14 @@ export class AppKitHelper {
   static readonly projectId = import.meta.env.VITE_PROJECT_ID
   static readonly CHAIN_STORAGE_KEY = 'connect-lab:chain'
 
-  static initializedChain: TSupportedChain | undefined
+  static chain: TSupportedChain | undefined
+  static initialized = false
 
   static solanaAdapter = new SolanaAdapter()
   static neo3Adapter = new Neo3Adapter()
   static stellarAdapter = new StellarAdapter()
   static bitcoinAdapter = new BitcoinAdapter()
+
   // One WagmiAdapter per EVM chain: its wagmi config chains must match the networks passed to createAppKit, otherwise
   // the WalletConnect connector sees the session chains as stale on reload (`isChainsStale`) and disconnects it
   static ethereumAdapter = AppKitHelper.createWagmiAdapter('ethereum')
@@ -41,78 +43,83 @@ export class AppKitHelper {
 
   // The WagmiAdapter AppKit was initialized with
   static get eip155Adapter(): WagmiAdapter {
-    const adapter = AppKitHelper.initializedChain && AppKitHelper.getAdapter(AppKitHelper.initializedChain).adapter
+    const adapter = AppKitHelper.chain && AppKitHelper.getAdapter(AppKitHelper.chain).adapter
+
     if (!(adapter instanceof WagmiAdapter)) throw new Error('AppKit is not initialized with an EIP155 chain')
+
     return adapter
   }
 
   static getStoredChain(): TSupportedChain | undefined {
     try {
       const chain = localStorage.getItem(AppKitHelper.CHAIN_STORAGE_KEY)
+
       return ChainHelper.supportedChains.find(supportedChain => supportedChain === chain)
     } catch {
       return undefined
     }
   }
 
-  /**
-   * AppKit is a singleton (global controllers) and cannot be re-created with another config.
-   * - Not initialized yet: create it for the given chain.
-   * - Initialized with another chain: persist the new chain and reload into the connect screen so AppKit boots with it.
-   * Returns whether AppKit is ready to be used for the given chain.
-   */
-  static setup(chain: TSupportedChain): boolean {
-    if (AppKitHelper.initializedChain === chain) return true
+  static setup(chain: TSupportedChain | undefined) {
+    if (AppKitHelper.chain === chain) return
 
     try {
-      localStorage.setItem(AppKitHelper.CHAIN_STORAGE_KEY, chain)
+      if (chain) {
+        localStorage.setItem(AppKitHelper.CHAIN_STORAGE_KEY, chain)
+      } else {
+        localStorage.removeItem(AppKitHelper.CHAIN_STORAGE_KEY)
+      }
     } catch {
       /* empty */
     }
 
-    if (AppKitHelper.initializedChain) {
-      window.location.assign(`${import.meta.env.BASE_URL}connect`)
-      return false
+    if (chain) {
+      if (AppKitHelper.initialized) {
+        window.location.assign(`${import.meta.env.BASE_URL}connect`)
+
+        return
+      }
+
+      const { networks } = ChainHelper.chainInfos[chain]
+      const { adapter, overrides } = AppKitHelper.getAdapter(chain)
+      const url = 'https://cityofzion.github.io/appkit-adapters/'
+
+      createAppKit({
+        projectId: AppKitHelper.projectId,
+        metadata: {
+          name: 'ConnectLab',
+          description: 'A testing environment for your WalletConnect V2 integrations.',
+          icons: [`${url}logo512.png`],
+          url,
+        },
+        networks: networks as [AppKitNetwork, ...Array<AppKitNetwork>],
+        adapters: [adapter],
+        universalProviderConfigOverride: overrides
+          ? AppKitHelper.mergeUniversalProviderConfigOverride(overrides)
+          : undefined,
+        features: {
+          analytics: false,
+          email: false,
+          onramp: false,
+          pay: false,
+          socials: false,
+          swaps: false,
+          send: false,
+          receive: false,
+        },
+        enableCoinbase: false,
+        themeVariables: {
+          '--apkt-accent': '#2563eb',
+          '--apkt-font-family': 'Plus Jakarta Sans',
+        },
+        featuredWalletIds: [
+          'f039a4bdf6d5a54065b6cc4b134e32d23bed5d391ad97f25aab5627de26a0784', // Neon Wallet
+        ],
+      })
     }
 
-    const { networks } = ChainHelper.chainInfos[chain]
-    const { adapter, overrides } = AppKitHelper.getAdapter(chain)
-
-    createAppKit({
-      projectId: AppKitHelper.projectId,
-      metadata: {
-        name: 'ConnectLab',
-        description: 'A testing environment for your WalletConnect V2 integrations.',
-        icons: ['https://cityofzion.github.io/appkit-adapters/logo512.png'],
-        url: 'https://cityofzion.github.io/appkit-adapters/',
-      },
-      networks: networks as [AppKitNetwork, ...Array<AppKitNetwork>],
-      adapters: [adapter],
-      universalProviderConfigOverride: overrides
-        ? AppKitHelper.mergeUniversalProviderConfigOverride(overrides)
-        : undefined,
-      features: {
-        analytics: false,
-        email: false,
-        onramp: false,
-        pay: false,
-        socials: false,
-        swaps: false,
-        send: false,
-        receive: false,
-      },
-      enableCoinbase: false,
-      themeVariables: {
-        '--apkt-accent': '#2563eb',
-        '--apkt-font-family': 'Plus Jakarta Sans',
-      },
-      featuredWalletIds: [
-        'f039a4bdf6d5a54065b6cc4b134e32d23bed5d391ad97f25aab5627de26a0784', // NEON Wallet
-      ],
-    })
-
-    AppKitHelper.initializedChain = chain
-    return true
+    AppKitHelper.chain = chain
+    AppKitHelper.initialized = true
   }
 
   static getAdapter(chain: TSupportedChain): { adapter: TAdapter; overrides?: TUniversalProviderConfigOverride } {

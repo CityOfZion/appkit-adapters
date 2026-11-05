@@ -11,7 +11,7 @@ export const Route = createFileRoute('/connect')({
 })
 
 function RouteComponent() {
-  const { connect, connectionInfo, selectedChain } = useConnection()
+  const { connect, selectChain, connectionInfo, selectedChain } = useConnection()
   const navigate = useNavigate()
   const [isOpening, startOpening] = useTransition()
 
@@ -19,7 +19,7 @@ function RouteComponent() {
     if (connectionInfo.status !== 'connected') return
 
     const timeoutId = setTimeout(() => {
-      navigate({ to: '/connected' })
+      void navigate({ to: '/connected' })
     }, 1500)
 
     return () => clearTimeout(timeoutId)
@@ -34,7 +34,7 @@ function RouteComponent() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-20 mt-24 flex flex-col items-center duration-500">
       <div
-        className="flex size-28 items-center justify-center rounded-[2rem] border border-white/10 bg-white/5 max-sm:size-20"
+        className="flex size-28 items-center justify-center rounded-4xl border border-white/10 bg-white/5 max-sm:size-20"
         style={{ boxShadow: `0 0 80px -10px ${chainInfo.color}` }}
       >
         <chainInfo.icon className="size-14 max-sm:size-10" />
@@ -63,7 +63,7 @@ function RouteComponent() {
           </Button>
 
           <Button size="lg" variant="secondary" asChild>
-            <Link to="/">
+            <Link to="/" onClick={() => selectChain(undefined)}>
               <ArrowLeftRight aria-hidden />
               Change network
             </Link>
