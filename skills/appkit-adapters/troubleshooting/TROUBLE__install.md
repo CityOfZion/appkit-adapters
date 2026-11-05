@@ -77,19 +77,7 @@ This doc is organized as: **symptom → likely cause → fix**.
 ### Fix
 - Install the peers explicitly, pinned to the same AppKit version as `@reown/appkit` (e.g. `@reown/appkit-common@1.8.19 @reown/appkit-controllers@1.8.19`).
 
-## Case 6 — `@cityofzion/appkit-bitcoin-adapter` not found on npm
-
-### Symptom
-- Install fails with 404 for the Bitcoin adapter.
-
-### Likely cause
-- The package may not be published yet.
-
-### Fix
-- Build it from this repo (`rush install && rush build-packages`) and link it with `"@cityofzion/appkit-bitcoin-adapter": "file:<path-to-repo>/packages/appkit-bitcoin-adapter"`, as the examples do.
-- Do not fall back to installing `@reown/appkit-adapter-bitcoin` alongside it; use one or the other.
-
-## Case 7 — Example install fails resolving `file:../../../../packages/...`
+## Case 6 — Example install fails resolving `file:../../../../packages/...`
 
 ### Symptom
 - `pnpm install` / `pnpm build` in `examples/vite-react-neo3` or `examples/simple-app` fails because the adapter's `dist/` is missing.

@@ -17,29 +17,11 @@ version: 0.3
 
 ## Install
 
-The package is **not yet published to npm**. Inside this repository, build it and link it locally:
-
 ```bash
-# repository root
-rush install
-rush build-packages
+pnpm add @cityofzion/appkit-bitcoin-adapter @reown/appkit @reown/appkit-common @reown/appkit-controllers @walletconnect/universal-provider
 ```
 
-```json
-{
-  "dependencies": {
-    "@cityofzion/appkit-bitcoin-adapter": "file:../../../../packages/appkit-bitcoin-adapter"
-  }
-}
-```
-
-(Path as used by `examples/simple-app`; adjust to your app's location.) Then install the required peers:
-
-```bash
-pnpm add @reown/appkit @reown/appkit-common @reown/appkit-controllers @walletconnect/universal-provider
-```
-
-Once published, install it like the other adapters: `pnpm add @cityofzion/appkit-bitcoin-adapter`.
+Inside this repository the examples link the local build instead (`rush install && rush build-packages`, then `"@cityofzion/appkit-bitcoin-adapter": "file:../../../../packages/appkit-bitcoin-adapter"`).
 
 ## Exports
 

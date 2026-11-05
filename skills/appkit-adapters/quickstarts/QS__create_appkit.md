@@ -63,7 +63,7 @@ createAppKit({
 ```
 
 ## Bitcoin
-WalletConnect-only Bitcoin (`bip122`) for wallets such as NEON Wallet. Use it instead of `@reown/appkit-adapter-bitcoin`, never both. Not yet published to npm; build it from this repository.
+WalletConnect-only Bitcoin (`bip122`) for wallets such as NEON Wallet. Use it instead of `@reown/appkit-adapter-bitcoin`, never both.
 
 ```ts
 import { createAppKit } from '@reown/appkit'

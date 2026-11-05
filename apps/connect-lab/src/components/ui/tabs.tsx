@@ -18,7 +18,10 @@ function List({ className, ...props }: React.ComponentProps<typeof TabsPrimitive
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
-      className="flex w-fit items-center justify-center gap-1 rounded-2xl border border-white/5 shadow-inner group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col"
+      className={StyleHelper.merge(
+        'flex w-fit items-center justify-center gap-1 rounded-2xl border border-white/5 shadow-inner group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col',
+        className
+      )}
       {...props}
     />
   )
